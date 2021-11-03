@@ -1,19 +1,21 @@
-open class RepeatAndJoin(
-    val parser: Parser,
-    val joinBetween: (contexts: List<ParsingContext>) -> ParsingContext
-) : Parser {
-    override fun getType() = "RepeatAndJoin"
+package prime.combinator.pasers.implementations
+
+import prime.combinator.pasers.Parser
+import prime.combinator.pasers.ParsingContext
+
+class Spaces() : Parser {
+    override fun getType() = "Spaces"
     override fun parse(context: ParsingContext): ParsingContext =
-        RepeatUntil(parser, Not(parser))
+        RepeatUntil(Character(' '), Not(Character(' ')))
             .joinRepeaters {
-                joinBetween(it)
+                AnyCharacter.join(it, "", "space")
             }
             .map {
                 it.copy(
-                    type = "RepeatAndJoin",
+                    type = "Spaces",
                     context = hashMapOf(
                         Pair(
-                            "joint",
+                            "spaces",
                             (it.context["repeater"] as ParsingContext).context["str"] as String
                         )
                     )

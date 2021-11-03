@@ -1,3 +1,7 @@
+package prime.combinator.pasers.implementations
+import prime.combinator.pasers.Parser
+import prime.combinator.pasers.ParsingContext
+import prime.combinator.pasers.ParsingError
 import java.util.*
 
 open class Str(val string: String) : Parser {

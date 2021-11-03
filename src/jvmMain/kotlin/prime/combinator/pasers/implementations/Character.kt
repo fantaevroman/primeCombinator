@@ -1,12 +1,15 @@
+package prime.combinator.pasers.implementations
+import prime.combinator.pasers.ParsingContext
+import prime.combinator.pasers.ParsingError
 import java.util.*
 
-class EnglishDigit : EndOfInputParser() {
-    override fun getType() = "EnglishLetter"
+class Character(private val char: Char) : EndOfInputParser() {
+    override fun getType() = "Character"
 
     override fun parseNext(context: ParsingContext): ParsingContext {
-        val next = Scanner(context.text).toString().toCharArray()[0]
         val currentIndex = context.indexEnd + 1
-        return if (((next in '1'..'9'))) {
+        val next = context.text.toCharArray()[currentIndex.toInt()]
+        return if (next == char) {
             context.copy(
                 indexStart = currentIndex,
                 indexEnd = currentIndex,
@@ -16,7 +19,7 @@ class EnglishDigit : EndOfInputParser() {
         } else {
             context.copy(
                 error = Optional.of(
-                    ParsingError("Can't parse English letter at index:[${currentIndex}], required:[1..9] but was:[$next]")
+                    ParsingError("Can't parse character at index:[${currentIndex}], required:[$char] but was:[$next]")
                 ),
                 type = getType(),
                 context = emptyMap(),

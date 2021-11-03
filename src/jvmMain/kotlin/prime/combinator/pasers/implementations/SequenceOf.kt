@@ -1,3 +1,8 @@
+package prime.combinator.pasers.implementations
+
+import prime.combinator.pasers.Parser
+import prime.combinator.pasers.ParsingContext
+
 open class SequenceOf(
     vararg val parsers: Parser
 ) : Parser {

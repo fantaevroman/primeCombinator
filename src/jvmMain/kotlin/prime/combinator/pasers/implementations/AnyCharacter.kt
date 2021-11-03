@@ -1,3 +1,6 @@
+package prime.combinator.pasers.implementations
+
+import prime.combinator.pasers.ParsingContext
 import java.util.*
 
 class AnyCharacter : EndOfInputParser() {

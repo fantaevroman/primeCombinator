@@ -1,1 +1,1 @@
-class DoubleQuote() : Str(""""""")
+package prime.combinator.pasers.implementations

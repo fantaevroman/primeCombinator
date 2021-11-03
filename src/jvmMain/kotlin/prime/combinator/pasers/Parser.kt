@@ -1,3 +1,4 @@
+package prime.combinator.pasers
 interface Parser {
     fun getType(): String
     fun parse(context: ParsingContext): ParsingContext
