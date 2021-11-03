@@ -1,3 +1,3 @@
 
-rootProject.name = "primeTemplate"
+rootProject.name = "primeCombinator"
 
