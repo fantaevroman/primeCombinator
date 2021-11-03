@@ -1,0 +1,1 @@
+data class ParsingError(val text: String)
