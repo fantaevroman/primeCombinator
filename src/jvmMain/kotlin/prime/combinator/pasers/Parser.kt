@@ -1,31 +1,27 @@
 package prime.combinator.pasers
-interface Parser {
+
+
+interface Parser<T : Parsed> {
     fun getType(): String
-    fun parse(context: ParsingContext): ParsingContext
-    fun map(transformer: (from: ParsingContext) -> ParsingContext) = map(this, transformer)
-    fun mapFail(transformer: (from: ParsingContext) -> ParsingContext) = mapFail(this, transformer)
-}
+    fun parse(parsed: Parsed): T
 
-fun mapFail(self: Parser, transformer: (from: ParsingContext) -> ParsingContext) = object : Parser {
-    override fun getType() = self.getType()
-    override fun parse(context: ParsingContext): ParsingContext {
-        val selfParsed = self.parse(context)
-        return if (selfParsed.fail()) {
-            transformer(selfParsed)
-        } else {
-            selfParsed
-        }
-    }
-}
+    fun <A : Parsed> map(
+        transformerSuccess: (from: T) -> A,
+        transformerFail: (from: T) -> A
+    ): Parser<A> {
+        val type = getType()
+        val selfParse = { context: Parsed -> parse(context) }
 
-fun map(self: Parser, transformer: (from: ParsingContext) -> ParsingContext) = object : Parser {
-    override fun getType() = self.getType()
-    override fun parse(context: ParsingContext): ParsingContext {
-        val selfParsed = self.parse(context)
-        return if (selfParsed.fail()) {
-            selfParsed
-        } else {
-            transformer(selfParsed)
+        return object : Parser<A> {
+            override fun getType() = type
+            override fun parse(parsed: Parsed): A {
+                val selfParsed = selfParse(parsed)
+                return if (selfParsed.success()) {
+                    transformerSuccess(selfParsed)
+                } else {
+                    transformerFail(selfParsed)
+                }
+            }
         }
     }
 }

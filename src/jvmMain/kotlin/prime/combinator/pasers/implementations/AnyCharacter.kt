@@ -1,41 +1,49 @@
 package prime.combinator.pasers.implementations
 
-import prime.combinator.pasers.ParsingContext
+import prime.combinator.pasers.Parsed
+import prime.combinator.pasers.ParsingError
+import prime.combinator.pasers.implementations.AnyCharacter.AnyCharacterParsed
 import java.util.*
 
-class AnyCharacter : EndOfInputParser() {
+class AnyCharacter : EndOfInputParser<AnyCharacterParsed>() {
+    inner class AnyCharacterParsed(
+        val parsed: Parsed,
+        val char: Char,
+        error: Optional<ParsingError> = Optional.empty()
+    ) :
+        Parsed(
+            parsed.text,
+            parsed.currentIndex(),
+            parsed.currentIndex() + 1,
+            error.map { emptyMap<String, Char>() }.orElseGet { hashMapOf(Pair(getType(), char)) },
+            getType(),
+            error
+        )
+
     override fun getType() = "AnyCharacter"
 
-    override fun parseNext(context: ParsingContext): ParsingContext {
-        val currentIndex = context.indexEnd + 1
-        return context.copy(
-            indexStart = currentIndex,
-            indexEnd = currentIndex,
-            context = hashMapOf(Pair("anyCharacter", context.text[currentIndex.toInt()])),
-            type = getType()
-        )
+    override fun parseNext(parsed: Parsed): AnyCharacterParsed {
+        return AnyCharacterParsed(parsed, parsed.text[parsed.currentIndex().toInt()])
     }
 
     companion object {
-        fun join(
-            list: List<ParsingContext>,
+        fun joinAsStr(
+            list: List<Parsed>,
             separator: String = "",
-            contextBodyName: String = "anyCharacter"
-        ): ParsingContext {
+            contextBodyName: String = "AnyCharacter"
+        ): Parsed {
             return if (list.isEmpty()) {
-                return ParsingContext("empty join Str", 0, 0, emptyMap(), "emptyJoin", Optional.empty())
+                return Parsed("empty join Str", 0, 0, emptyMap(), "emptyJoin", Optional.empty())
             } else {
-                list.last().copy(
-                    type = "Str",
-                    context = hashMapOf(
-                        Pair(
-                            "str",
-                            list.map { anyCharContext -> anyCharContext.context[contextBodyName] }
-                                .joinToString(separator = separator)
-                        )
-                    )
-                )
+                val joinedStr = list.map { anyCharContext -> anyCharContext.context[contextBodyName] }
+                    .joinToString(separator = separator)
+                val lastCharParsed = list.last()
+                return Str(joinedStr).StrParsed(lastCharParsed, joinedStr)
             }
         }
+    }
+
+    override fun asError(parsed: Parsed, message: String): AnyCharacterParsed {
+        return AnyCharacterParsed(parsed, 'e', Optional.of(ParsingError(message)))
     }
 }

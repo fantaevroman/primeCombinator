@@ -1,27 +1,20 @@
 package prime.combinator.pasers.implementations
 
+import prime.combinator.pasers.Parsed
 import prime.combinator.pasers.Parser
-import prime.combinator.pasers.ParsingContext
+import prime.combinator.pasers.implementations.RepeatUntil.JoinedParsed
 
-open class RepeatAndJoin(
-    val parser: Parser,
-    val joinBetween: (contexts: List<ParsingContext>) -> ParsingContext
-) : Parser {
+open class RepeatAndJoin<F, T>(
+    val parser: Parser<out Parsed>,
+    val joinBetween: (parsed: List<F>) -> T
+) : Parser<JoinedParsed<T>> {
+
     override fun getType() = "RepeatAndJoin"
-    override fun parse(context: ParsingContext): ParsingContext =
-        RepeatUntil(parser, Not(parser))
-            .joinRepeaters {
-                joinBetween(it)
-            }
-            .map {
-                it.copy(
-                    type = "RepeatAndJoin",
-                    context = hashMapOf(
-                        Pair(
-                            "joint",
-                            (it.context["repeater"] as ParsingContext).context["str"] as String
-                        )
-                    )
-                )
-            }.parse(context)
+
+    override fun parse(parsed: Parsed): JoinedParsed<T> {
+        return RepeatUntil(parser, Not(parser))
+            .joinRepeaters { repeatersParsed: List<F> ->
+                joinBetween(repeatersParsed)
+            }.parse(parsed)
+    }
 }

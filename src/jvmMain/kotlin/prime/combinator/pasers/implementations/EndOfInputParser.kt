@@ -1,24 +1,17 @@
 package prime.combinator.pasers.implementations
-import prime.combinator.pasers.Parser
-import prime.combinator.pasers.ParsingContext
-import prime.combinator.pasers.ParsingError
-import java.util.*
 
-abstract class EndOfInputParser : Parser {
-    override fun parse(context: ParsingContext): ParsingContext {
-        val currentIndex = context.indexEnd + 1
-        return if (context.text.length - 1 < currentIndex) {
-            context.copy(
-                error = Optional.of(ParsingError("Can't parse at index:[${currentIndex}] end of text")),
-                type = getType(),
-                indexStart = currentIndex,
-                indexEnd = currentIndex,
-                context = emptyMap()
-            )
+import prime.combinator.pasers.Parsed
+import prime.combinator.pasers.Parser
+
+abstract class EndOfInputParser<T : Parsed> : Parser<T> {
+    override fun parse(parsed: Parsed): T {
+        return if (parsed.currentIndex() > parsed.textMaxIndex()) {
+            asError(parsed, "Can't parse: end of text")
         } else {
-            parseNext(context)
+            parseNext(parsed)
         }
     }
 
-    abstract fun parseNext(context: ParsingContext): ParsingContext
+    abstract fun parseNext(parsed: Parsed): T
+    abstract fun asError(parsed: Parsed, message: String): T
 }

@@ -1,31 +1,37 @@
 package prime.combinator.pasers.implementations
-import prime.combinator.pasers.ParsingContext
+import prime.combinator.pasers.Parsed
 import prime.combinator.pasers.ParsingError
+import prime.combinator.pasers.implementations.EnglishDigit.EnglishDigitParsed
 import java.util.*
 
-class EnglishDigit : EndOfInputParser() {
+class EnglishDigit : EndOfInputParser<EnglishDigitParsed>() {
+
+    inner class EnglishDigitParsed(
+        val parsed: Parsed,
+        val short: Short,
+        error: Optional<ParsingError> = Optional.empty()
+    ) :
+        Parsed(
+            parsed.text,
+            parsed.currentIndex(),
+            parsed.currentIndex() + 1,
+            error.map { emptyMap<String, Short>() }.orElseGet { hashMapOf(Pair(getType(), short)) },
+            getType(),
+            error
+        )
+
     override fun getType() = "EnglishLetter"
 
-    override fun parseNext(context: ParsingContext): ParsingContext {
-        val next = Scanner(context.text).toString().toCharArray()[0]
-        val currentIndex = context.indexEnd + 1
+    override fun parseNext(parsed: Parsed): EnglishDigitParsed {
+        val next = Scanner(parsed.text).toString().toCharArray()[0]
         return if (((next in '1'..'9'))) {
-            context.copy(
-                indexStart = currentIndex,
-                indexEnd = currentIndex,
-                context = hashMapOf(Pair("character", next)),
-                type = getType()
-            )
+            EnglishDigitParsed(parsed, next.toShort())
         } else {
-            context.copy(
-                error = Optional.of(
-                    ParsingError("Can't parse English letter at index:[${currentIndex}], required:[1..9] but was:[$next]")
-                ),
-                type = getType(),
-                context = emptyMap(),
-                indexStart = currentIndex,
-                indexEnd = currentIndex,
-            )
+            asError(parsed, "Can't parse English digit required:[1..9] but was:[$next]")
         }
+    }
+
+    override fun asError(parsed: Parsed, message: String): EnglishDigitParsed {
+        return EnglishDigitParsed(parsed, 0, Optional.of(ParsingError(message)))
     }
 }

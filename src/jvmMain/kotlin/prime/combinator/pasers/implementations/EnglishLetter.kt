@@ -1,38 +1,37 @@
 package prime.combinator.pasers.implementations
-import prime.combinator.pasers.Parser
-import prime.combinator.pasers.ParsingContext
+import prime.combinator.pasers.Parsed
 import prime.combinator.pasers.ParsingError
+import prime.combinator.pasers.implementations.EnglishLetter.EnglishLetterParsed
 import java.util.*
 
-class EnglishLetter : EndOfInputParser() {
+class EnglishLetter : EndOfInputParser<EnglishLetterParsed>() {
+
+    inner class EnglishLetterParsed(
+        val parsed: Parsed,
+        val char: Char,
+        error: Optional<ParsingError> = Optional.empty()
+    ) :
+        Parsed(
+            parsed.text,
+            parsed.currentIndex(),
+            parsed.currentIndex() + 1,
+            error.map { emptyMap<String, Char>() }.orElseGet { hashMapOf(Pair(getType(), char)) },
+            getType(),
+            error
+        )
+
     override fun getType() = "EnglishLetter"
 
-    override fun parseNext(context: ParsingContext): ParsingContext {
-        val currentIndex = context.indexEnd + 1
-        val next = context.text.toCharArray()[currentIndex.toInt()]
+    override fun parseNext(parsed: Parsed): EnglishLetterParsed {
+        val next = parsed.text.toCharArray()[parsed.currentIndex().toInt()]
         return if (((next in 'a'..'z')) || ((next in 'A'..'Z'))) {
-            context.copy(
-                indexStart = currentIndex,
-                indexEnd = currentIndex,
-                context = hashMapOf(Pair("letter", next)),
-                type = getType()
-            )
+            EnglishLetterParsed(parsed, next)
         } else {
-            context.copy(
-                error = Optional.of(
-                    ParsingError("Can't parse English letter at index:[${currentIndex}], required:[a..z, A..Z] but was:[$next]")
-                ),
-                type = getType(),
-                context = emptyMap(),
-                indexStart = currentIndex,
-                indexEnd = currentIndex,
-            )
+            asError(parsed, "[$next] not an english letter")
         }
     }
 
-    fun asChar(): Parser {
-        return this.map { it.copy(
-            type = "Character",
-            context = hashMapOf(Pair("character", it.context["letter"].toString()))) }
+    override fun asError(parsed: Parsed, message: String): EnglishLetterParsed {
+        return EnglishLetterParsed(parsed, 'e', Optional.of(ParsingError(message)))
     }
 }

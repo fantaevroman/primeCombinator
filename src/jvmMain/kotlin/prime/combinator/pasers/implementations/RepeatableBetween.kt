@@ -1,31 +1,46 @@
 package prime.combinator.pasers.implementations
 
+import prime.combinator.pasers.Parsed
 import prime.combinator.pasers.Parser
-import prime.combinator.pasers.ParsingContext
+import prime.combinator.pasers.ParsingError
+import prime.combinator.pasers.implementations.RepeatableBetween.RepeatableBetweenParsed
+import java.util.*
 
-class RepeatableBetween(
-    private val left: Parser,
-    private val between: Parser,
-    private val right: Parser,
-    private val sequenceOf: Parser = SequenceOf(left, RepeatUntil(between, right), right)
-) : Parser {
+class RepeatableBetween<L : Parsed, M : Parsed, R : Parsed>(
+    private val left: Parser<L>,
+    private val between: Parser<M>,
+    private val right: Parser<R>
+) : Parser<RepeatableBetween<L, M, R>.RepeatableBetweenParsed> {
+
+    inner class RepeatableBetweenParsed(
+        val parsed: Parsed,
+        val left: L,
+        val between: List<M>,
+        val right: R,
+        error: Optional<ParsingError> = Optional.empty()
+    ) :
+        Parsed(
+            parsed.text,
+            left.indexStart,
+            right.indexEnd,
+            emptyMap(),
+            getType(),
+            error
+        )
+
     override fun getType() = "RepeatableBetween"
 
-    override fun parse(context: ParsingContext): ParsingContext {
-        return sequenceOf.map {
-            val between = (it.context["sequence"] as List<ParsingContext>)[1]
-            val repeaters = (between.context["repeaters"] as List<ParsingContext>)
-            it.copy(
-                context = hashMapOf(
-                    Pair("between", repeaters),
-                    Pair("left", (it.context["sequence"] as List<ParsingContext>)[0]),
-                    Pair("right", (it.context["sequence"] as List<ParsingContext>)[2])
-                )
-            )
-        }.parse(context).copy(
-            type = getType(),
-            indexStart = context.indexStart + 1
-        )
+    override fun parse(parsed: Parsed): RepeatableBetweenParsed {
+          Between(left, RepeatUntil(between, right), right).map(
+              {success ->
+                  RepeatableBetweenParsed(parsed, success.left as L ,
+                      success.between as List<M>,
+                      success.right as R)
+              },
+              {fail ->  }
+          )
+
+
     }
 
     fun mapEach(
@@ -39,50 +54,8 @@ class RepeatableBetween(
 
 
     fun joinBetween(joinBetween: (contexts: List<ParsingContext>) -> ParsingContext): Parser {
-        return this.map { original ->
-            original.copy(
-                context =
-                hashMapOf(
-                    Pair("left", original.context["left"]!!),
-                    Pair("right", original.context["right"]!!),
-                    Pair(
-                        "between",
-                        joinBetween(original.context["between"] as List<ParsingContext>)
-                    )
-                )
-            )
-        }
     }
 
     fun joinBetweenCharsToStrings() = this.map { repeatableContext ->
-        val between = repeatableContext.context["between"] as List<ParsingContext>
-        fun isString(c: ParsingContext) = c.type == "AnyCharacter" || c.type == "Str"
-        val joined = mutableListOf<ParsingContext>()
-
-        for (r in between) {
-            if (joined.isEmpty()) {
-                joined.add(r)
-                continue
-            } else {
-                val l = joined.last()
-                if (isString(l) && isString(r)) {
-                    joined.removeLast()
-                    joined.add(
-                        l.copy(
-                            type = "Str",
-                            context = hashMapOf(
-                                Pair(
-                                    "str",
-                                    l.context[if (l.type == "AnyCharacter") "anyCharacter" else "str"].toString() + r.context["anyCharacter"]
-                                )
-                            )
-                        )
-                    )
-                } else {
-                    joined.add(r)
-                }
-            }
-        }
-        repeatableContext.copy(context = mapOf(Pair("between", joined)))
     }
 }

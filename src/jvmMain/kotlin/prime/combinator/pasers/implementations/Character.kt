@@ -1,31 +1,40 @@
 package prime.combinator.pasers.implementations
-import prime.combinator.pasers.ParsingContext
+
+import prime.combinator.pasers.Parsed
 import prime.combinator.pasers.ParsingError
+import prime.combinator.pasers.implementations.Character.CharacterParsed
 import java.util.*
 
-class Character(private val char: Char) : EndOfInputParser() {
+class Character(private val char: Char) : EndOfInputParser<CharacterParsed>() {
+    inner class CharacterParsed(
+        val parsed: Parsed,
+        val char: Char,
+        error: Optional<ParsingError> = Optional.empty()
+    ) :
+        Parsed(
+            parsed.text,
+            parsed.currentIndex(),
+            parsed.currentIndex() + 1,
+            error.map { emptyMap<String, Char>() }.orElseGet { hashMapOf(Pair(getType(), char)) },
+            getType(),
+            error
+        )
+
     override fun getType() = "Character"
 
-    override fun parseNext(context: ParsingContext): ParsingContext {
-        val currentIndex = context.indexEnd + 1
-        val next = context.text.toCharArray()[currentIndex.toInt()]
+    override fun parseNext(parsed: Parsed): CharacterParsed {
+        val next = parsed.text.toCharArray()[parsed.currentIndex().toInt()]
         return if (next == char) {
-            context.copy(
-                indexStart = currentIndex,
-                indexEnd = currentIndex,
-                context = hashMapOf(Pair("character", next)),
-                type = getType()
-            )
+            CharacterParsed(parsed, next)
         } else {
-            context.copy(
-                error = Optional.of(
-                    ParsingError("Can't parse character at index:[${currentIndex}], required:[$char] but was:[$next]")
-                ),
-                type = getType(),
-                context = emptyMap(),
-                indexStart = currentIndex,
-                indexEnd = currentIndex,
+            asError(
+                parsed,
+                "Can't parse character at index:[${parsed.currentIndex()}], required:[$char] but was:[$next]"
             )
         }
+    }
+
+    override fun asError(parsed: Parsed, message: String): CharacterParsed {
+        return CharacterParsed(parsed, 'e', Optional.of(ParsingError(message)))
     }
 }

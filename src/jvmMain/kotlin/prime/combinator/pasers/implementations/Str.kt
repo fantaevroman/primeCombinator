@@ -1,43 +1,44 @@
 package prime.combinator.pasers.implementations
-import prime.combinator.pasers.Parser
-import prime.combinator.pasers.ParsingContext
-import prime.combinator.pasers.ParsingError
-import java.util.*
 
-open class Str(val string: String) : Parser {
+import prime.combinator.pasers.Parsed
+import prime.combinator.pasers.Parser
+import prime.combinator.pasers.ParsingError
+import prime.combinator.pasers.implementations.Str.StrParsed
+import java.util.*
+import kotlin.Long
+
+open class Str(val string: String) : Parser<StrParsed> {
+    inner class StrParsed(
+        val parsed: Parsed,
+        val str: String,
+        error: Optional<ParsingError> = Optional.empty()
+    ) :
+        Parsed(
+            parsed.text,
+            parsed.currentIndex(),
+            parsed.currentIndex() + string.length - 1,
+            error.map { emptyMap<String, String>() }.orElseGet { hashMapOf(Pair(getType(), str)) },
+            getType(),
+            error
+        )
+
     override fun getType() = "Str"
 
-    override fun parse(context: ParsingContext): ParsingContext {
-        val currentIndex = context.indexEnd + 1
-        if (context.text.length - 1 < currentIndex - 1 + string.length) {
-            return context.copy(
-                indexStart = currentIndex,
-                indexEnd = currentIndex + string.length - 1,
-                error = Optional.of(ParsingError("Can't parse at index:[${currentIndex}] end of text")),
-                type = "Str",
-                context = emptyMap()
-            )
+    override fun parse(parsed: Parsed): StrParsed {
+        return if (parsed.textMaxIndex() < parsed.currentIndex() + string.length) {
+            asError(parsed, "Cant parse string, end of text")
         } else {
-            val expectedIndex = currentIndex.toInt()
-            val indexOf = context.text.indexOf(string, expectedIndex)
+            val expectedIndex = parsed.currentIndex().toInt()
+            val indexOf = parsed.text.indexOf(string, expectedIndex)
             return if (indexOf == expectedIndex) {
-                context.copy(
-                    indexStart = currentIndex,
-                    indexEnd = currentIndex + string.length - 1,
-                    context = hashMapOf(
-                        Pair("str", string)
-                    ),
-                    type = "Str"
-                )
+                StrParsed(parsed, string)
             } else {
-                context.copy(
-                    indexStart = currentIndex,
-                    indexEnd = currentIndex + string.length - 1,
-                    error = Optional.of(ParsingError("Can't parse at index:[${currentIndex}] [$string] not found")),
-                    type = "Str",
-                    context = emptyMap()
-                )
+                asError(parsed, "Can't parse, [$string] not found")
             }
         }
+    }
+
+    fun asError(parsed: Parsed, message: String): StrParsed {
+        return StrParsed(parsed, "error", Optional.of(ParsingError(message)))
     }
 }
