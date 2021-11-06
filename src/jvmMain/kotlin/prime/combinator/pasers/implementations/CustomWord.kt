@@ -13,16 +13,15 @@ class CustomWord(private vararg val allowedChars: Parser<CharacterParsed>) : Par
     inner class CustomWordParsed(val customWord: String, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 
     override fun parse(previous: Parsed): ParsedResult<CustomWordParsed> {
-        val repeatAndJoinParsed = RepeatAndJoin(Any(*allowedChars)) { repeated: List<Any.AnyParsed> ->
-            repeated.map { it.anyOne as CharacterParsed }.map { it.char }.joinToString(separator = "")
-        }.parse(previous)
 
-        return ParsedResult.asSuccess(
+        return Repeat(Any(*allowedChars)).joinRepeaters { repeated: List<Any.AnyParsed> ->
+            repeated.map { it.anyOne as CharacterParsed }.map { it.char }.joinToString(separator = "")
+        }.map {
             CustomWordParsed(
-                repeatAndJoinParsed.joined.get(),
+                it.joined,
                 previous,
-                previous.indexEnd + repeatAndJoinParsed.joined.get().length
+                previous.indexEnd + it.joined.length
             )
-        )
+        }.parse(previous)
     }
 }

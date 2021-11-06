@@ -1,44 +1,27 @@
 package prime.combinator.pasers.implementations
 
 import prime.combinator.pasers.Parsed
+import prime.combinator.pasers.ParsedResult
 import prime.combinator.pasers.Parser
 import prime.combinator.pasers.ParsingError
 import prime.combinator.pasers.implementations.Str.StrParsed
 import java.util.*
 import kotlin.Long
 
-open class Str(val string: String) : Parser<StrParsed> {
-    inner class StrParsed(
-        val parsed: Parsed,
-        val str: String,
-        error: Optional<ParsingError> = Optional.empty()
-    ) :
-        Parsed(
-            parsed.text,
-            parsed.currentIndex(),
-            parsed.currentIndex() + string.length - 1,
-            error.map { emptyMap<String, String>() }.orElseGet { hashMapOf(Pair(getType(), str)) },
-            getType(),
-            error
-        )
+open class Str(val str: String) : Parser<StrParsed> {
+    inner class StrParsed(val str: String, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 
-    override fun getType() = "Str"
-
-    override fun parse(parsed: Parsed): StrParsed {
-        return if (parsed.textMaxIndex() < parsed.currentIndex() + string.length) {
-            asError(parsed, "Cant parse string, end of text")
+    override fun parse(previous: Parsed): ParsedResult<StrParsed> {
+        return if (previous.textMaxIndex() < previous.currentIndex() + str.length) {
+            ParsedResult.asError("Cant parse string, end of text")
         } else {
-            val expectedIndex = parsed.currentIndex().toInt()
-            val indexOf = parsed.text.indexOf(string, expectedIndex)
+            val expectedIndex = previous.currentIndex().toInt()
+            val indexOf = previous.text.indexOf(str, expectedIndex)
             return if (indexOf == expectedIndex) {
-                StrParsed(parsed, string)
+                ParsedResult.asSuccess(StrParsed(str, previous, previous.currentIndex() + str.length - 1))
             } else {
-                asError(parsed, "Can't parse, [$string] not found")
+                ParsedResult.asError("Can't parse, [$str] not found")
             }
         }
-    }
-
-    fun asError(parsed: Parsed, message: String): StrParsed {
-        return StrParsed(parsed, "error", Optional.of(ParsingError(message)))
     }
 }

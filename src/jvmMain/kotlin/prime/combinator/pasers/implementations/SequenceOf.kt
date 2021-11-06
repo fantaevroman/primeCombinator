@@ -1,49 +1,46 @@
 package prime.combinator.pasers.implementations
 
 import prime.combinator.pasers.Parsed
+import prime.combinator.pasers.ParsedResult
 import prime.combinator.pasers.Parser
-import prime.combinator.pasers.ParsingError
 import prime.combinator.pasers.implementations.SequenceOf.SequenceOfParsed
 import java.util.*
+import kotlin.Long
 
 open class SequenceOf(vararg val parsers: Parser<out Parsed>) : Parser<SequenceOfParsed> {
-
     inner class SequenceOfParsed(
-        val parsed: Parsed,
         val sequence: List<Parsed>,
-        error: Optional<ParsingError> = Optional.empty()
-    ) : Parsed(
-        parsed.text,
-        sequence.first().indexStart,
-        sequence.last().indexEnd,
-        error.map { emptyMap<String, List<Parsed>>() }.orElseGet {
-            hashMapOf(Pair(getType(), sequence))
-        },
-        getType(),
-        error
-    )
+        previous: Parsed,
+        indexEnd: Long
+    ) : Parsed(previous, indexEnd)
 
-    override fun getType() = "SequenceOf"
 
-    override fun parse(parsed: Parsed): SequenceOfParsed {
+    override fun parse(previous: Parsed): ParsedResult<SequenceOfParsed> {
         val successSequence = mutableListOf<Parsed>()
         val parsersIterator = parsers.iterator().withIndex()
-        var currentContext = parsed
+        var currentContext = previous
 
         while (parsersIterator.hasNext()) {
             val nextParser = parsersIterator.next()
             val nextTransformedParser =
                 oneEachTransform(nextParser.index, currentContext, nextParser.value, successSequence)
 
-            currentContext = nextTransformedParser.parse(currentContext)
-            if (currentContext.success()) {
+            val currentResult = nextTransformedParser.parse(currentContext)
+            if (currentResult.success()) {
+                currentContext = currentResult.get()
                 successSequence.add(currentContext)
             } else {
-                SequenceOfParsed(parsed, successSequence, parsed.error)
+                return ParsedResult.asError(currentResult.error.get())
             }
         }
 
-        return SequenceOfParsed(successSequence.last(), successSequence)
+        return ParsedResult.asSuccess(
+            SequenceOfParsed(
+                successSequence,
+                successSequence.last(),
+                successSequence.last().indexEnd
+            )
+        )
     }
 
     open fun oneEachTransform(
@@ -57,18 +54,15 @@ open class SequenceOf(vararg val parsers: Parser<out Parsed>) : Parser<SequenceO
 
     fun mapEach(
         transformer: (
-            currentContext: Parsed,
+            currentParsed: Parsed,
             currentParser: Parser<out Parsed>,
-            previous: List<Parsed>,
+            previousParsed: List<Parsed>,
             currentIndex: Int
         ) -> Parser<out Parsed>
     ) = object : SequenceOf(*this.parsers) {
-        override fun getType(): String {
-            return super.getType()
-        }
 
-        override fun parse(parsed: Parsed): SequenceOfParsed {
-            return super.parse(parsed)
+        override fun parse(previous: Parsed): ParsedResult<SequenceOfParsed> {
+            return super.parse(previous)
         }
 
         override fun oneEachTransform(

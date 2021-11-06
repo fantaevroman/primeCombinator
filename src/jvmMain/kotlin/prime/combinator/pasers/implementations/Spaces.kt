@@ -1,24 +1,20 @@
 package prime.combinator.pasers.implementations
 
-import prime.combinator.pasers.Parser
-import prime.combinator.pasers.ParsingContext
+import prime.combinator.pasers.Parsed
+import prime.combinator.pasers.ParsedResult
+import kotlin.Long
 
-class Spaces() : Parser {
-    override fun getType() = "Spaces"
-    override fun parse(context: ParsingContext): ParsingContext =
-        RepeatUntil(Character(' '), Not(Character(' ')))
-            .joinRepeaters {
-                AnyCharacter.join(it, "", "space")
-            }
+
+class Spaces : EndOfInputParser<Spaces.SpacesParsed>() {
+    inner class SpacesParsed(val spaces: String, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
+
+    override fun parseNext(previous: Parsed): ParsedResult<SpacesParsed> {
+        return Repeat(Character(' '))
+            .joinRepeaters { it.map { it.char }.joinToString(separator = "") }
             .map {
-                it.copy(
-                    type = "Spaces",
-                    context = hashMapOf(
-                        Pair(
-                            "spaces",
-                            (it.context["repeater"] as ParsingContext).context["str"] as String
-                        )
-                    )
-                )
-            }.parse(context)
+                SpacesParsed(it.joined, previous, it.indexEnd)
+            }.parse(previous)
+    }
 }
+
+
