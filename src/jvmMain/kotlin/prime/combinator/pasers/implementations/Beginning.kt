@@ -1,31 +1,20 @@
 package prime.combinator.pasers.implementations
 import prime.combinator.pasers.Parsed
+import prime.combinator.pasers.ParsedResult
 import prime.combinator.pasers.Parser
 import prime.combinator.pasers.ParsingError
 import prime.combinator.pasers.implementations.Beginning.BeginningParsed
 import java.util.*
+import kotlin.Long
 
-class Beginning() : Parser<BeginningParsed> {
-    inner class BeginningParsed(
-        val parsed: Parsed,
-        error: Optional<ParsingError> = Optional.empty()
-    ) :
-        Parsed(
-            parsed.text,
-            parsed.currentIndex(),
-            parsed.currentIndex() + 1,
-            error.map { emptyMap<String, Boolean>() }.orElseGet { hashMapOf(Pair(getType(), true)) },
-            getType(),
-            error
-        )
+class Beginning : Parser<BeginningParsed> {
+    inner class BeginningParsed(previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 
-    override fun getType() = "Beginning"
-
-    override fun parse(parsed: Parsed): BeginningParsed {
-        return if (parsed.currentIndex() == -1L) {
-            BeginningParsed(parsed)
+    override fun parse(previous: Parsed): ParsedResult<BeginningParsed> {
+        return if (previous.currentIndex() == -1L) {
+            ParsedResult.asSuccess(BeginningParsed(previous, -1))
         } else {
-            BeginningParsed(parsed, Optional.of(ParsingError("Not beginning of the text")))
+            ParsedResult.asError("Not beginning of the text")
         }
     }
 }

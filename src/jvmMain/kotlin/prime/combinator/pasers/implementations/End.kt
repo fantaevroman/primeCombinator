@@ -1,31 +1,24 @@
 package prime.combinator.pasers.implementations
+
 import prime.combinator.pasers.Parsed
+import prime.combinator.pasers.ParsedResult
 import prime.combinator.pasers.Parser
-import prime.combinator.pasers.ParsingError
-import java.util.*
+import prime.combinator.pasers.implementations.End.EndParsed
+import kotlin.Long
 
-class End() : Parser<Parsed> {
+class End() : Parser<EndParsed> {
+    inner class EndParsed(previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 
-    inner class EndParsed(
-        val parsed: Parsed,
-        error: Optional<ParsingError> = Optional.empty()
-    ) :
-        Parsed(
-            parsed.text,
-            parsed.currentIndex(),
-            parsed.currentIndex() + 1,
-            error.map { emptyMap<String, Boolean>() }.orElseGet { hashMapOf(Pair(getType(), true)) },
-            getType(),
-            error
-        )
-
-    override fun getType() = "End"
-
-    override fun parse(parsed: Parsed): Parsed {
-        return when{
-            parsed.textMaxIndex().toLong() == parsed.currentIndex() -> EndParsed(parsed)
-            parsed.textMaxIndex().toLong() < parsed.currentIndex() -> EndParsed(parsed, Optional.of(ParsingError("Not end")))
-            else -> EndParsed(parsed, Optional.of(ParsingError("End index is shorter than current position")))
+    override fun parse(previous: Parsed): ParsedResult<EndParsed> {
+        return when {
+            previous.textMaxIndex().toLong() == previous.currentIndex() -> ParsedResult.asSuccess(
+                EndParsed(
+                    previous,
+                    previous.currentIndex()
+                )
+            )
+            previous.textMaxIndex().toLong() < previous.currentIndex() -> ParsedResult.asError("Not end")
+            else -> ParsedResult.asError("End index is shorter than current position")
         }
     }
 }

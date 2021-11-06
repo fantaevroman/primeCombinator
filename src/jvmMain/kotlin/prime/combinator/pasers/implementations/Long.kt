@@ -1,39 +1,22 @@
 package prime.combinator.pasers.implementations
 
 import prime.combinator.pasers.Parsed
+import prime.combinator.pasers.ParsedResult
 import prime.combinator.pasers.ParsingError
 import prime.combinator.pasers.implementations.Long.LongParsed
 import java.util.*
 import kotlin.Long
 
 class Long : EndOfInputParser<LongParsed>() {
-    inner class LongParsed(
-        val parsed: Parsed,
-        val long: Long,
-        error: Optional<ParsingError> = Optional.empty()
-    ) :
-        Parsed(
-            parsed.text,
-            parsed.currentIndex(),
-            parsed.currentIndex() + 1,
-            error.map { emptyMap<String, Long>() }.orElseGet { hashMapOf(Pair(getType(), long)) },
-            getType(),
-            error
-        )
+    inner class LongParsed(val long: Long, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 
-    override fun getType() = "Long"
-
-    override fun parseNext(parsed: Parsed): LongParsed {
-        val scanner = Scanner(parsed.text)
+    override fun parseNext(previous: Parsed): ParsedResult<LongParsed> {
+        val scanner = Scanner(previous.text)
 
         return if (scanner.hasNextLong()) {
-            LongParsed(parsed, scanner.nextLong())
+            ParsedResult.asSuccess(LongParsed(scanner.nextLong(), previous, scanner.nextLong()))
         } else {
-            asError(parsed, "Can't parse Long at index:[${parsed.currentIndex()}]")
+            ParsedResult.asError("Can't parse Long")
         }
-    }
-
-    override fun asError(parsed: Parsed, message: String): LongParsed {
-        return LongParsed(parsed, 0, Optional.of(ParsingError(message)))
     }
 }

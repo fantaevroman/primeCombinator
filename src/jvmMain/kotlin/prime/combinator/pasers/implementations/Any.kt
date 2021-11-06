@@ -1,44 +1,25 @@
 package prime.combinator.pasers.implementations
 
 import prime.combinator.pasers.Parsed
+import prime.combinator.pasers.ParsedResult
 import prime.combinator.pasers.Parser
-import prime.combinator.pasers.ParsingError
 import prime.combinator.pasers.implementations.Any.AnyParsed
-import java.util.*
+import kotlin.Long
 
-class  Any(private vararg val parsers: Parser<*>) : EndOfInputParser<AnyParsed>() {
-    inner class AnyParsed(
-        val parsed: Parsed,
-        val anyOne: Parsed,
-        error: Optional<ParsingError> = Optional.empty()
-    ) :
-        Parsed(
-            parsed.text,
-            anyOne.indexStart,
-            anyOne.indexEnd,
-            error.map { emptyMap<String, Parsed>() }.orElseGet { hashMapOf(Pair(getType(), anyOne)) },
-            getType(),
-            error
-        )
+class Any(private vararg val parsers: Parser<*>) : EndOfInputParser<AnyParsed>() {
+    inner class AnyParsed(previous: Parsed, val anyOne: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 
-    override fun getType() = "Any"
-
-    override fun parseNext(parsed: Parsed): AnyParsed {
+    override fun parseNext(previous: Parsed): ParsedResult<AnyParsed> {
         val iterator = parsers.iterator()
         while (iterator.hasNext()) {
-            val parserResult = iterator.next().parse(parsed)
+            val parserResult = iterator.next().parse(previous)
             if (parserResult.success()) {
-                return AnyParsed(parsed, parserResult)
+                parserResult.map {
+                    AnyParsed(previous, it, it.indexEnd)
+                }.get()
             }
         }
 
-        return asError(
-            parsed,
-            "Non of supplied parsers matched:[${parsers.joinToString(separator = ",") { it.getType() }}]"
-        )
-    }
-
-    override fun asError(parsed: Parsed, message: String): AnyParsed {
-        return AnyParsed(parsed, Parsed.asError(parsed, message))
+        return ParsedResult.asError("No of supplied parsed matched at Any operation")
     }
 }

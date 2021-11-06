@@ -1,19 +1,13 @@
 package prime.combinator.pasers
+
 import java.util.*
 
 open class Parsed(
     val text: String,
     val indexStart: Long,
-    val indexEnd: Long,
-    val context: Map<String, Any>,
-    val type: String,
-    val error: Optional<ParsingError>
+    val indexEnd: Long
 ) {
-    fun fail() = error.isPresent
-    fun success() = !error.isPresent
-    override fun toString(): String {
-        return "ParsingContext(type='$type', error=$error)"
-    }
+    constructor(previous: Parsed, indexEnd: Long) : this(previous.text, previous.currentIndex(), indexEnd)
 
     fun currentIndex(): Long {
         return indexEnd + 1
@@ -22,10 +16,38 @@ open class Parsed(
     fun textMaxIndex(): Int {
         return text.length - 1
     }
+}
+
+
+class ParsedResult<T : Parsed>(val parsed: Optional<T>, val error: Optional<String>) {
+
+    fun success(): Boolean {
+        return !error.isPresent
+    }
+
+    fun <A : Parsed> map(mapper: (T: Parsed) -> A): ParsedResult<A> {
+        return if (success()) {
+            asSuccess(mapper(this.parsed.get()))
+        } else {
+            asError(error.get())
+        }
+    }
+
+    fun get(): T{
+        if(success()){
+            return parsed.get()
+        }else{
+            throw RuntimeException("Can't perform get on failed ParsedResult")
+        }
+    }
 
     companion object {
-        fun asError(parsed: Parsed, message: String): Parsed {
-            return Parsed(parsed.text, parsed.currentIndex(), parsed.currentIndex(), emptyMap(), parsed.type, Optional.of(ParsingError(message)))
+        fun <T : Parsed> asSuccess(parsed: T): ParsedResult<T> {
+            return ParsedResult(Optional.of(parsed), Optional.empty())
+        }
+
+        fun <T : Parsed> asError(message: String): ParsedResult<T> {
+            return ParsedResult(Optional.empty(), Optional.of(message))
         }
     }
 }

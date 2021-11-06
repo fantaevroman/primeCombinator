@@ -1,40 +1,22 @@
 package prime.combinator.pasers.implementations
 
 import prime.combinator.pasers.Parsed
+import prime.combinator.pasers.ParsedResult
 import prime.combinator.pasers.ParsingError
 import prime.combinator.pasers.implementations.Character.CharacterParsed
 import java.util.*
+import kotlin.Long
 
 class Character(private val char: Char) : EndOfInputParser<CharacterParsed>() {
-    inner class CharacterParsed(
-        val parsed: Parsed,
-        val char: Char,
-        error: Optional<ParsingError> = Optional.empty()
-    ) :
-        Parsed(
-            parsed.text,
-            parsed.currentIndex(),
-            parsed.currentIndex() + 1,
-            error.map { emptyMap<String, Char>() }.orElseGet { hashMapOf(Pair(getType(), char)) },
-            getType(),
-            error
-        )
+    inner class CharacterParsed(val char: Char, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 
-    override fun getType() = "Character"
+    override fun parseNext(previous: Parsed): ParsedResult<CharacterParsed> {
+        val charParsed = previous.text.toCharArray()[previous.currentIndex().toInt()]
+        return if (charParsed == char) {
+            ParsedResult.asSuccess(CharacterParsed(charParsed, previous, previous.currentIndex()))
 
-    override fun parseNext(parsed: Parsed): CharacterParsed {
-        val next = parsed.text.toCharArray()[parsed.currentIndex().toInt()]
-        return if (next == char) {
-            CharacterParsed(parsed, next)
         } else {
-            asError(
-                parsed,
-                "Can't parse character at index:[${parsed.currentIndex()}], required:[$char] but was:[$next]"
-            )
+            ParsedResult.asError("Can't parse character required:[$char] but was:[$charParsed]")
         }
-    }
-
-    override fun asError(parsed: Parsed, message: String): CharacterParsed {
-        return CharacterParsed(parsed, 'e', Optional.of(ParsingError(message)))
     }
 }

@@ -1,37 +1,19 @@
 package prime.combinator.pasers.implementations
+
 import prime.combinator.pasers.Parsed
-import prime.combinator.pasers.ParsingError
+import prime.combinator.pasers.ParsedResult
 import prime.combinator.pasers.implementations.EnglishLetter.EnglishLetterParsed
-import java.util.*
+import kotlin.Long
 
 class EnglishLetter : EndOfInputParser<EnglishLetterParsed>() {
+    inner class EnglishLetterParsed(val letter: Char, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 
-    inner class EnglishLetterParsed(
-        val parsed: Parsed,
-        val char: Char,
-        error: Optional<ParsingError> = Optional.empty()
-    ) :
-        Parsed(
-            parsed.text,
-            parsed.currentIndex(),
-            parsed.currentIndex() + 1,
-            error.map { emptyMap<String, Char>() }.orElseGet { hashMapOf(Pair(getType(), char)) },
-            getType(),
-            error
-        )
-
-    override fun getType() = "EnglishLetter"
-
-    override fun parseNext(parsed: Parsed): EnglishLetterParsed {
-        val next = parsed.text.toCharArray()[parsed.currentIndex().toInt()]
-        return if (((next in 'a'..'z')) || ((next in 'A'..'Z'))) {
-            EnglishLetterParsed(parsed, next)
+    override fun parseNext(previous: Parsed): ParsedResult<EnglishLetterParsed> {
+        val char = previous.text.toCharArray()[previous.currentIndex().toInt()]
+        return if (((char in 'a'..'z')) || ((char in 'A'..'Z'))) {
+            ParsedResult.asSuccess(EnglishLetterParsed(char, previous, previous.currentIndex()))
         } else {
-            asError(parsed, "[$next] not an english letter")
+            ParsedResult.asError("[$char] not an english letter")
         }
-    }
-
-    override fun asError(parsed: Parsed, message: String): EnglishLetterParsed {
-        return EnglishLetterParsed(parsed, 'e', Optional.of(ParsingError(message)))
     }
 }

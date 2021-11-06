@@ -1,27 +1,24 @@
 package prime.combinator.pasers
 
 
-interface Parser<T : Parsed> {
-    fun getType(): String
-    fun parse(parsed: Parsed): T
+interface Parser<S : Parsed> {
+    fun parse(previous: Parsed): ParsedResult<S>
 
     fun <A : Parsed> map(
-        transformerSuccess: (from: T) -> A,
-        transformerFail: (from: T) -> A
+        transformer: (from: S) -> A
     ): Parser<A> {
-        val type = getType()
         val selfParse = { context: Parsed -> parse(context) }
 
         return object : Parser<A> {
-            override fun getType() = type
-            override fun parse(parsed: Parsed): A {
-                val selfParsed = selfParse(parsed)
+            override fun parse(previous: Parsed): ParsedResult<A> {
+                val selfParsed = selfParse(previous)
                 return if (selfParsed.success()) {
-                    transformerSuccess(selfParsed)
+                    ParsedResult.asSuccess(transformer(selfParsed.parsed.get()))
                 } else {
-                    transformerFail(selfParsed)
+                    ParsedResult.asError(selfParsed.error.get())
                 }
             }
         }
     }
 }
+

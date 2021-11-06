@@ -1,98 +1,54 @@
 package prime.combinator.pasers.implementations
 
 import prime.combinator.pasers.Parsed
+import prime.combinator.pasers.ParsedResult
 import prime.combinator.pasers.Parser
-import prime.combinator.pasers.ParsingError
-import prime.combinator.pasers.implementations.RepeatUntil.RepeatUntilParsed
-import java.util.*
-import kotlin.Any
 import kotlin.Long
 
-class RepeatUntil(
-    private val repeater: Parser<out Parsed>,
-    private val until: Parser<out Parsed>
-) : Parser<RepeatUntilParsed> {
+class RepeatUntil<R : Parsed, U : Parsed>(
+    private val repeater: Parser<R>,
+    private val until: Parser<U>
+) : Parser<RepeatUntil<R, U>.RepeatUntilParsed> {
 
     inner class RepeatUntilParsed(
-        val repeatersParsed: List<Parsed>,
-        val untilParsed: Parsed,
-        error: Optional<ParsingError> = Optional.empty()
-    ) :
-        Parsed(
-            untilParsed.text,
-            repeatersParsed.first().indexStart,
-            untilParsed.indexEnd,
-            error.map { emptyMap<String, Any>() }.orElseGet {
-                hashMapOf(
-                    Pair("repeaters", repeatersParsed),
-                    Pair("until", untilParsed)
-                )
-            },
-            getType(),
-            error
-        )
+        val repeatersParsed: List<R>,
+        val untilParsed: U,
+    ) : Parsed(
+        untilParsed.text,
+        repeatersParsed.first().indexStart,
+        untilParsed.indexEnd,
+    )
 
     inner class JoinedParsed<T>(
-        val joined: Optional<T>,
-        text: String,
-        indexStart: Long,
-        indexEnd: Long,
-        error: Optional<ParsingError> = Optional.empty()
-    ) :
-        Parsed(
-            text,
-            indexStart,
-            indexEnd,
-            error.map { emptyMap<String, Any>() }.orElseGet {
-                hashMapOf(
-                    Pair("joined", joined as Any)
-                )
-            },
-            getType(),
-            error
-        )
+        val joined: T,
+        previous: Parsed,
+        indexEnd: Long
+    ) : Parsed(previous, indexEnd)
 
-    override fun getType() = "RepeatUntil"
 
-    override fun parse(parsed: Parsed): RepeatUntilParsed {
-        val repeaters = mutableListOf(repeater.parse(parsed))
+    override fun parse(previous: Parsed): ParsedResult<RepeatUntilParsed> {
+        val repeaters = mutableListOf(repeater.parse(previous))
         val untils = mutableListOf<Parsed>()
 
         while (true) {
-            if (repeaters.last().fail()) {
-                return RepeatUntilParsed(repeaters, repeaters.last(), repeaters.last().error)
+            if (!repeaters.last().success()) {
+                return ParsedResult.asError(repeaters.last().error.get())
             }
 
-            val currentUntil = until.parse(repeaters.last())
+            val currentUntil = until.parse(repeaters.last().get())
             if (currentUntil.success()) {
-                untils.add(currentUntil)
-                return RepeatUntilParsed(repeaters, currentUntil)
+                untils.add(currentUntil.get())
+                return ParsedResult.asSuccess(RepeatUntilParsed(repeaters.map { it.get() }, currentUntil.get()))
             }
 
-            repeaters.add(repeater.parse(repeaters.last()))
+            repeaters.add(repeater.parse(repeaters.last().get()))
         }
     }
 
-    fun <T : Parsed, K> joinRepeaters(joinBetween: (parsed: List<T>) -> K): Parser<JoinedParsed<K>> {
-        return this.map(
-            { success ->
-                JoinedParsed(
-                    Optional.of(joinBetween(success.repeatersParsed as List<T>)),
-                    success.text,
-                    success.repeatersParsed.first().indexStart,
-                    success.untilParsed.indexEnd,
-                    success.error
-                )
-            },
-            { fail ->
-                val last = fail.repeatersParsed.last()
-                JoinedParsed(
-                    Optional.empty(),
-                    last.text,
-                    last.indexStart,
-                    last.indexEnd,
-                    fail.error
-                )
-            })
+    fun <K> joinRepeaters(joinBetween: (parsed: List<R>) -> K): Parser<JoinedParsed<K>> {
+        return this.map {
+            JoinedParsed(joinBetween(it.repeatersParsed), it.untilParsed, it.untilParsed.indexEnd)
+        }
     }
 }
+
