@@ -8,6 +8,15 @@ import prime.combinator.pasers.implementations.Not.NotParsed
 import java.util.*
 import kotlin.Long
 
+/**
+ * Not inverses parser.
+ * It doesn't capture end index!
+ * @License: Apache-2.0
+ * @source: https://github.com/fantaevroman/primeCombinator
+ * @author: Roman Fantaev
+ * @contact: FantaevRoman@gmail.com
+ * @since 2021
+ */
 class Not(
     private val parser: Parser<out Parsed>
 ) : Parser<NotParsed> {

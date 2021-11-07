@@ -6,6 +6,20 @@ import prime.combinator.pasers.Parser
 import prime.combinator.pasers.implementations.End.EndParsed
 import kotlin.Long
 
+
+/**
+ * End allows specifying end of the text
+ * Example:
+ *  aim: we want parse end of text
+ *  how to reach:  End().parse(startParsing("")).get()
+ *  result: successfully parsed end of the text because it's empty and we reach end immediately
+ *
+ * @License: Apache-2.0
+ * @source: https://github.com/fantaevroman/primeCombinator
+ * @author: Roman Fantaev
+ * @contact: FantaevRoman@gmail.com
+ * @since 2021
+ */
 class End() : Parser<EndParsed> {
     inner class EndParsed(previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 

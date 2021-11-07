@@ -4,7 +4,20 @@ import prime.combinator.pasers.Parsed
 import prime.combinator.pasers.ParsedResult
 import kotlin.Long
 
-
+/**
+ * Spaces allows parsing several space at one time
+ * Example:
+ *  aim: we want to parse string spaces in the beginning of sting "   Name is ..."
+ *  how to reach:  Spaces().parse(startParsing("   Name is ...")).get()
+ *
+ *  result: spaces presiding "Name" are parsed.
+ *
+ * @License: Apache-2.0
+ * @source: https://github.com/fantaevroman/primeCombinator
+ * @author: Roman Fantaev
+ * @contact: FantaevRoman@gmail.com
+ * @since 2021
+ */
 class Spaces : EndOfInputParser<Spaces.SpacesParsed>() {
     inner class SpacesParsed(val spaces: String, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 

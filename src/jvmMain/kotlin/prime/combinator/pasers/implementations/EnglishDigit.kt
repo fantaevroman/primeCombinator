@@ -1,11 +1,22 @@
 package prime.combinator.pasers.implementations
 import prime.combinator.pasers.Parsed
 import prime.combinator.pasers.ParsedResult
-import prime.combinator.pasers.ParsingError
 import prime.combinator.pasers.implementations.EnglishDigit.EnglishDigitParsed
-import java.util.*
 import kotlin.Long
 
+/**
+ * EnglishDigit allows parsing only digits '1'..'9'
+ * Example:
+ *  aim: we want parse only digits
+ *  how to reach:  EnglishDigit().parse(startParsing("1")).get()
+ *  result: successfully parsed digit "1".
+ *
+ * @License: Apache-2.0
+ * @source: https://github.com/fantaevroman/primeCombinator
+ * @author: Roman Fantaev
+ * @contact: FantaevRoman@gmail.com
+ * @since 2021
+ */
 class EnglishDigit : EndOfInputParser<EnglishDigitParsed>() {
     inner class EnglishDigitParsed(val digit: Short, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 

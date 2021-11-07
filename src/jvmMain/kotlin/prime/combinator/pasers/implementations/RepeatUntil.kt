@@ -5,6 +5,19 @@ import prime.combinator.pasers.ParsedResult
 import prime.combinator.pasers.Parser
 import kotlin.Long
 
+/**
+ * RepeatUntil allows parsing until another parser is reached
+ * Example:
+ *  aim: we want to parse character "a" until we reach character "b"
+ *  how to reach:  RepeatUntil(Character('a'), Character('b')).parse(startParsing("aaab")).get()
+ *  result: successfully parsed character "a" 3 times before we reached "b".
+ *
+ * @License: Apache-2.0
+ * @source: https://github.com/fantaevroman/primeCombinator
+ * @author: Roman Fantaev
+ * @contact: FantaevRoman@gmail.com
+ * @since 2021
+ */
 class RepeatUntil<R : Parsed, U : Parsed>(
     private val repeater: Parser<R>,
     private val until: Parser<U>

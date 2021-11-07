@@ -169,13 +169,13 @@ class TestParsers {
 
     @Test
     fun testBetween() {
-        val betweenParsed = Between(Character('a'), Character('b'), Character('c'))
-            .parse(startParsing("abc")).get()
+        val betweenParsed = Between(Character('['), Character('b'), Character(']'))
+            .parse(startParsing("[b]")).get()
         assertEquals(0, betweenParsed.indexStart)
         assertEquals(2, betweenParsed.indexEnd)
         assertEquals('b', betweenParsed.between.char)
-        assertEquals('a', betweenParsed.left.char)
-        assertEquals('c', betweenParsed.right.char)
+        assertEquals('[', betweenParsed.left.char)
+        assertEquals(']', betweenParsed.right.char)
     }
 
     @Test
@@ -193,6 +193,15 @@ class TestParsers {
         assertEquals(0, anyCharacterParsed.indexStart)
         assertEquals(0, anyCharacterParsed.indexEnd)
         assertEquals('a', anyCharacterParsed.char)
+    }
+
+    @Test
+    fun testCharacter() {
+        val characterParsed = Character('a')
+            .parse(startParsing("a")).get()
+        assertEquals(0, characterParsed.indexStart)
+        assertEquals(0, characterParsed.indexEnd)
+        assertEquals('a', characterParsed.char)
     }
 
     @Test

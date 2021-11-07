@@ -8,6 +8,20 @@ import prime.combinator.pasers.implementations.Str.StrParsed
 import java.util.*
 import kotlin.Long
 
+/**
+ * Str allows parsing specified string
+ * Example:
+ *  aim: we want to parse string "Name" in the beginning of text "Name is ..."
+ *  how to reach: Str("Name").parse(startParsing("Name is ...")).get()
+ *
+ *  result: String "Name" is parsed.
+ *
+ * @License: Apache-2.0
+ * @source: https://github.com/fantaevroman/primeCombinator
+ * @author: Roman Fantaev
+ * @contact: FantaevRoman@gmail.com
+ * @since 2021
+ */
 open class Str(val str: String) : Parser<StrParsed> {
     inner class StrParsed(val str: String, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 

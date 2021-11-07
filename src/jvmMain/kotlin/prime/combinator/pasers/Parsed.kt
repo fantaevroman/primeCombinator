@@ -2,6 +2,18 @@ package prime.combinator.pasers
 
 import java.util.*
 
+/**
+ * Parsed represent a result of successfully worked parser.
+ * text - originial text parser worked on (whole text)
+ * indexStart - from which point parser started working
+ * indexEnd - at which point parser stopped working
+
+ * @License: Apache-2.0
+ * @source: https://github.com/fantaevroman/primeCombinator
+ * @author: Roman Fantaev
+ * @contact: FantaevRoman@gmail.com
+ * @since 2021
+ */
 open class Parsed(
     val text: String,
     val indexStart: Long,
@@ -18,7 +30,17 @@ open class Parsed(
     }
 }
 
-
+/**
+ * Parsed represent a result of worked parser.
+ * parsed - in case of successful parsing, contains indexes of parsed part of the text
+ * error - in case error happened during parsing, contains error message
+ *
+ * @License: Apache-2.0
+ * @source: https://github.com/fantaevroman/primeCombinator
+ * @author: Roman Fantaev
+ * @contact: FantaevRoman@gmail.com
+ * @since 2021
+ */
 class ParsedResult<T : Parsed>(val parsed: Optional<T>, val error: Optional<String>) {
 
     fun success(): Boolean {

@@ -5,6 +5,20 @@ import prime.combinator.pasers.ParsedResult
 import prime.combinator.pasers.implementations.EnglishLetter.EnglishLetterParsed
 import kotlin.Long
 
+
+/**
+ * EnglishLetter allows parsing only english letters (no special symbols)
+ * Example:
+ *  aim: we want parse one letter
+ *  how to reach:  EnglishLetter().parse(startParsing("a")).get()
+ *  result: successfully parsed letter "a".
+ *
+ * @License: Apache-2.0
+ * @source: https://github.com/fantaevroman/primeCombinator
+ * @author: Roman Fantaev
+ * @contact: FantaevRoman@gmail.com
+ * @since 2021
+ */
 class EnglishLetter : EndOfInputParser<EnglishLetterParsed>() {
     inner class EnglishLetterParsed(val letter: Char, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 

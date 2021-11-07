@@ -4,9 +4,26 @@ import prime.combinator.pasers.Parsed
 import prime.combinator.pasers.ParsedResult
 import prime.combinator.pasers.Parser
 import prime.combinator.pasers.implementations.SequenceOf.SequenceOfParsed
-import java.util.*
 import kotlin.Long
 
+/**
+ * SequenceOf allows parsing several parsers as a sequence
+ * Example:
+ *  aim: we want to parse string "   Name is" which consists of spaces and words
+ *  how to reach:  SequenceOf(Beginning(), Spaces(), Word(), Spaces(), Word(), End())
+ *  .parse(startParsing("   Name is")).get()
+ *  result: successfully string.
+ *
+ *  We can reach each parser result as parsedSequenceOf.sequence.
+ *  Each Parser has convinient method to convert type of result "fromSequence".
+ *  See example here: TestParsers#testSequenceOf.
+ *
+ * @License: Apache-2.0
+ * @source: https://github.com/fantaevroman/primeCombinator
+ * @author: Roman Fantaev
+ * @contact: FantaevRoman@gmail.com
+ * @since 2021
+ */
 open class SequenceOf(vararg val parsers: Parser<out Parsed>) : Parser<SequenceOfParsed> {
     inner class SequenceOfParsed(
         val sequence: List<Parsed>,
