@@ -32,12 +32,10 @@ http://combinator.primeframeworks.com
 ## How to install:
 todo
 
-
-##Licence:
+## Licence:
 Apache License
 Version 2.0
 
-
-##Contacts:
-####Author: Roman Fantaev
-####Email: fantaevroman@gmail.com
+## Contacts:
+#### Author: Roman Fantaev
+#### Email: fantaevroman@gmail.com
