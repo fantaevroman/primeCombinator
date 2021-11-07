@@ -33,11 +33,11 @@ class ParsedResult<T : Parsed>(val parsed: Optional<T>, val error: Optional<Stri
         }
     }
 
-    fun get(): T{
-        if(success()){
+    fun get(): T {
+        if (success()) {
             return parsed.get()
-        }else{
-            throw RuntimeException("Can't perform get on failed ParsedResult")
+        } else {
+            throw RuntimeException("Can't perform get on failed ParsedResult, error=[${error.get()}]")
         }
     }
 
