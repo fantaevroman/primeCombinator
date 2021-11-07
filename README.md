@@ -9,6 +9,8 @@ Let's say we need to fetch protocol and domain name from URL.
 Here is an example how we take it from url: "http://combinator.primeframeworks.com"
 
 ```
+//Kotlin example
+
 val parsedUrl = SequenceOf(
     Any(Str("http"), Str("https")),
     Str("://"),
