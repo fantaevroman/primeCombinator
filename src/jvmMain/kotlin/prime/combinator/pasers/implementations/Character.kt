@@ -21,7 +21,15 @@ import kotlin.Long
  * @since 2021
  */
 class Character(private val char: Char) : EndOfInputParser<CharacterParsed>() {
-    inner class CharacterParsed(val char: Char, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
+    inner class CharacterParsed(val char: Char, text: String, indexStart: Long, indexEnd: Long) :
+        Parsed(text, indexStart, indexEnd) {
+        constructor(char: Char, previous: Parsed, indexEnd: Long) : this(
+            char,
+            previous.text,
+            previous.currentIndex(),
+            indexEnd
+        )
+    }
 
     override fun parseNext(previous: Parsed): ParsedResult<CharacterParsed> {
         val charParsed = previous.text.toCharArray()[previous.currentIndex().toInt()]

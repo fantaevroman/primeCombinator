@@ -2,6 +2,7 @@ package prime.combinator.pasers.implementations
 
 import prime.combinator.pasers.Parsed
 import prime.combinator.pasers.ParsedResult
+import prime.combinator.pasers.Parser
 import prime.combinator.pasers.implementations.EnglishLetter.EnglishLetterParsed
 import kotlin.Long
 
@@ -29,5 +30,11 @@ class EnglishLetter : EndOfInputParser<EnglishLetterParsed>() {
         } else {
             ParsedResult.asError("[$char] not an english letter")
         }
+    }
+
+    fun asChar(): Parser<Character.CharacterParsed> {
+         return this.map {
+             Character(it.letter).CharacterParsed(it.letter, it.text, it.indexStart, it.indexEnd)
+         }
     }
 }
