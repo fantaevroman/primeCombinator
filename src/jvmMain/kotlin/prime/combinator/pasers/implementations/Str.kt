@@ -12,7 +12,7 @@ open class Str(val str: String) : Parser<StrParsed> {
     inner class StrParsed(val str: String, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 
     override fun parse(previous: Parsed): ParsedResult<StrParsed> {
-        return if (previous.textMaxIndex() < previous.currentIndex() + str.length) {
+        return if (previous.textMaxIndex() < previous.indexEnd + str.length) {
             ParsedResult.asError("Cant parse string, end of text")
         } else {
             val expectedIndex = previous.currentIndex().toInt()

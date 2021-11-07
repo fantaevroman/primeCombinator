@@ -4,6 +4,7 @@ package prime.combinator.pasers
 interface Parser<S : Parsed> {
     fun parse(previous: Parsed): ParsedResult<S>
 
+
     fun <A : Parsed> map(
         transformer: (from: S) -> A
     ): Parser<A> {
@@ -20,5 +21,10 @@ interface Parser<S : Parsed> {
             }
         }
     }
+
+    fun fromSequence(sequence: List<Parsed>, index: Int): S {
+        return sequence[index] as S
+    }
+
 }
 

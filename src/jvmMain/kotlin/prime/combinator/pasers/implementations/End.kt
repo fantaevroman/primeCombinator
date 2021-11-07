@@ -11,13 +11,20 @@ class End() : Parser<EndParsed> {
 
     override fun parse(previous: Parsed): ParsedResult<EndParsed> {
         return when {
-            previous.textMaxIndex().toLong() == previous.currentIndex() -> ParsedResult.asSuccess(
+            previous.indexEnd == -1L -> ParsedResult.asSuccess(
+                EndParsed(
+                    previous,
+                    -1
+                )
+            )
+
+            previous.textMaxIndex().toLong() == previous.indexEnd -> ParsedResult.asSuccess(
                 EndParsed(
                     previous,
                     previous.currentIndex()
                 )
             )
-            previous.textMaxIndex().toLong() < previous.currentIndex() -> ParsedResult.asError("Not end")
+            previous.textMaxIndex().toLong() < previous.indexEnd -> ParsedResult.asError("Not end")
             else -> ParsedResult.asError("End index is shorter than current position")
         }
     }

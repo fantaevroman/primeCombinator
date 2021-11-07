@@ -11,7 +11,7 @@ class Beginning : Parser<BeginningParsed> {
     inner class BeginningParsed(previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
 
     override fun parse(previous: Parsed): ParsedResult<BeginningParsed> {
-        return if (previous.currentIndex() == -1L) {
+        return if (previous.indexEnd == -1L) {
             ParsedResult.asSuccess(BeginningParsed(previous, -1))
         } else {
             ParsedResult.asError("Not beginning of the text")
