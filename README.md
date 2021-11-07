@@ -26,7 +26,7 @@ assertEquals("combinator.primeframeworks.com", domainName)
 ```
 Framework does its best to provide strictly typed system where possible as well as convenient API.
 
-##Documentaion
+## Documentation:
 http://combinator.primeframeworks.com 
 
 ## How to install:
