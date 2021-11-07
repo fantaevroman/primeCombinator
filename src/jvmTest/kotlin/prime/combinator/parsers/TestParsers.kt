@@ -5,6 +5,14 @@ import prime.combinator.pasers.implementations.*
 import prime.combinator.pasers.startParsing
 import kotlin.test.assertEquals
 
+/**
+ * Common tests for all parsers in lib
+ * @License: Apache-2.0
+ * @source: https://github.com/fantaevroman/primeCombinator
+ * @author: Roman Fantaev
+ * @contact: FantaevRoman@gmail.com
+ * @since 2021
+ */
 class TestParsers {
 
     @Test
