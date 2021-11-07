@@ -8,13 +8,13 @@ import java.util.*
 import kotlin.Long
 
 class Long : EndOfInputParser<LongParsed>() {
-    inner class LongParsed(val long: Long, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
+    inner class LongParsed(val long: Long, previous: Parsed) : Parsed(previous, previous.currentIndex())
 
     override fun parseNext(previous: Parsed): ParsedResult<LongParsed> {
         val scanner = Scanner(previous.text)
 
         return if (scanner.hasNextLong()) {
-            ParsedResult.asSuccess(LongParsed(scanner.nextLong(), previous, scanner.nextLong()))
+            ParsedResult.asSuccess(LongParsed(scanner.nextLong(), previous))
         } else {
             ParsedResult.asError("Can't parse Long")
         }

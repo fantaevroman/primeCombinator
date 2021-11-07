@@ -14,7 +14,7 @@ class End() : Parser<EndParsed> {
             previous.indexEnd == -1L -> ParsedResult.asSuccess(
                 EndParsed(
                     previous,
-                    -1
+                    0
                 )
             )
 

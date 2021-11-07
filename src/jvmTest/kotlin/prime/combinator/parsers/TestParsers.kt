@@ -106,10 +106,102 @@ class TestParsers {
     @Test
     fun testRepeatableBetweenJoined() {
         val repeatableBetweenParsed = RepeatableBetween(Str("["), EnglishLetter(), Str("]"))
-            .joinRepeaters { it.map { it.letter }.joinToString (separator = "") }
+            .joinRepeaters { it.map { it.letter }.joinToString(separator = "") }
             .parse(startParsing("[Na]")).get()
         assertEquals(0, repeatableBetweenParsed.indexStart)
         assertEquals(3, repeatableBetweenParsed.indexEnd)
         assertEquals("Na", repeatableBetweenParsed.between)
     }
+
+    @Test
+    fun testNot() {
+        val notA = Not(Str("a")).parse(startParsing("b")).get()
+        assertEquals(0, notA.indexStart)
+    }
+
+    @Test
+    fun testLong() {
+        val longParsed = Long().parse(startParsing("1")).get()
+        assertEquals(0, longParsed.indexStart)
+        assertEquals(0, longParsed.indexEnd)
+        assertEquals(1L, longParsed.long)
+    }
+
+    @Test
+    fun testEnglishLetter() {
+        val englishLetterParsed = EnglishLetter().parse(startParsing("a")).get()
+        assertEquals(0, englishLetterParsed.indexStart)
+        assertEquals(0, englishLetterParsed.indexEnd)
+        assertEquals('a', englishLetterParsed.letter)
+    }
+
+    @Test
+    fun testEnglishDigit() {
+        val englishDigitParsed = EnglishDigit().parse(startParsing("1")).get()
+        assertEquals(0, englishDigitParsed.indexStart)
+        assertEquals(0, englishDigitParsed.indexEnd)
+        assertEquals(1, englishDigitParsed.digit)
+    }
+
+    @Test
+    fun testEnd() {
+        val endParsed = End().parse(startParsing("")).get()
+        assertEquals(0, endParsed.indexStart)
+        assertEquals(0, endParsed.indexEnd)
+    }
+
+    @Test
+    fun testDoubleQuote() {
+        val doubleQuoteParsed = DoubleQuote().parse(startParsing(""""""")).get()
+        assertEquals(0, doubleQuoteParsed.indexStart)
+        assertEquals(0, doubleQuoteParsed.indexEnd)
+        assertEquals(""""""", doubleQuoteParsed.str)
+    }
+
+    @Test
+    fun testCustomWord() {
+        val customWordParsed = CustomWord(Character('a'), Character('b'))
+            .parse(startParsing("abc")).get()
+        assertEquals(0, customWordParsed.indexStart)
+        assertEquals(1, customWordParsed.indexEnd)
+        assertEquals("ab", customWordParsed.customWord)
+    }
+
+    @Test
+    fun testBetween() {
+        val betweenParsed = Between(Character('a'), Character('b'), Character('c'))
+            .parse(startParsing("abc")).get()
+        assertEquals(0, betweenParsed.indexStart)
+        assertEquals(2, betweenParsed.indexEnd)
+        assertEquals('b', betweenParsed.between.char)
+        assertEquals('a', betweenParsed.left.char)
+        assertEquals('c', betweenParsed.right.char)
+    }
+
+    @Test
+    fun testBeginning() {
+        val beginningParsing = Beginning()
+            .parse(startParsing("")).get()
+        assertEquals(0, beginningParsing.indexStart)
+        assertEquals(-1, beginningParsing.indexEnd)
+    }
+
+    @Test
+    fun testAnyCharacter() {
+        val anyCharacterParsed = AnyCharacter()
+            .parse(startParsing("a")).get()
+        assertEquals(0, anyCharacterParsed.indexStart)
+        assertEquals(0, anyCharacterParsed.indexEnd)
+        assertEquals('a', anyCharacterParsed.char)
+    }
+
+    @Test
+    fun testAny() {
+        val anyParsed = Any(Character('a'), Character('b'))
+            .parse(startParsing("b")).get()
+        assertEquals(0, anyParsed.indexStart)
+        assertEquals(0, anyParsed.indexEnd)
+        assertEquals('b', (anyParsed.anyOne as Character.CharacterParsed).char)
+    }
+
 }

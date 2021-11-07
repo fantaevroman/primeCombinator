@@ -12,11 +12,11 @@ class Any(private vararg val parsers: Parser<*>) : EndOfInputParser<AnyParsed>()
     override fun parseNext(previous: Parsed): ParsedResult<AnyParsed> {
         val iterator = parsers.iterator()
         while (iterator.hasNext()) {
-            val parserResult = iterator.next().parse(previous)
+            val parserResult = iterator.next().parse(previous).map {
+                AnyParsed(previous, it, it.indexEnd)
+            }
             if (parserResult.success()) {
-                parserResult.map {
-                    AnyParsed(previous, it, it.indexEnd)
-                }.get()
+                return parserResult
             }
         }
 
