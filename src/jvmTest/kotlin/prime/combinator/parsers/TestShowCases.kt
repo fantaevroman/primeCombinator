@@ -58,11 +58,24 @@ class TestShowCases {
 
     @Test
     fun testAny() {
-        val anyParsed = Any(Word(), EnglishDigit())
-            .parse("1 is not a name").get()
+        val anyParsed = Any(Word(), EnglishDigit()).parse("1 is not a name").get()
         assertEquals(0, anyParsed.indexStart)
         assertEquals(0, anyParsed.indexEnd)
         assertEquals(1, (anyParsed.anyOne as EnglishDigit.EnglishDigitParsed).digit)
     }
 
+
+    @Test
+    fun testParseDocument() {
+        val document =  SequenceOf(Beginning(), Repeat(Any(Word(), Spaces(), EnglishDigit())), End()).parse("1 is not a name").get()
+        val repeatParserOutput = document.sequence[1] as Repeat<Any.AnyParsed>.RepeatParsed
+        val eightParserResultInsideRepeat = repeatParserOutput.repeatersParsed[8].anyOne as Word.WordParsed
+        assertEquals("name", eightParserResultInsideRepeat.word)
+    }
+
+    @Test
+    fun testCustomWord() {
+        val document =  CustomWord(EnglishLetter().asChar(), Character('.')).parse("my.domain.com").get()
+        assertEquals("my.domain.com", document.customWord)
+    }
 }

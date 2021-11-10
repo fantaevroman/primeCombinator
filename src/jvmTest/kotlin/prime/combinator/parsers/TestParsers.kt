@@ -167,8 +167,7 @@ class TestParsers {
 
     @Test
     fun testCustomWord() {
-        val customWordParsed = CustomWord(Character('a'), Character('b'))
-            .parse("abc").get()
+        val customWordParsed = CustomWord(Character('a'), Character('b')).parse("abc").get()
         assertEquals(0, customWordParsed.indexStart)
         assertEquals(1, customWordParsed.indexEnd)
         assertEquals("ab", customWordParsed.customWord)
@@ -196,7 +195,7 @@ class TestParsers {
     @Test
     fun testAnyCharacter() {
         val anyCharacterParsed = AnyCharacter()
-            .parse("a").get()
+            .parse("abc").get()
         assertEquals(0, anyCharacterParsed.indexStart)
         assertEquals(0, anyCharacterParsed.indexEnd)
         assertEquals('a', anyCharacterParsed.char)
@@ -204,8 +203,7 @@ class TestParsers {
 
     @Test
     fun testCharacter() {
-        val characterParsed = Character('a')
-            .parse("a").get()
+        val characterParsed = Character('a').parse("abc").get()
         assertEquals(0, characterParsed.indexStart)
         assertEquals(0, characterParsed.indexEnd)
         assertEquals('a', characterParsed.char)
