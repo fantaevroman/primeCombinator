@@ -79,11 +79,11 @@ class TestParsers {
 
     @Test
     fun testRepeat() {
-        val repeatableBetweenParsed = Repeat(EnglishLetter())
+        val repeatParsed = Repeat(EnglishLetter())
             .parse("Name1").get()
-        assertEquals(0, repeatableBetweenParsed.indexStart)
-        assertEquals(3, repeatableBetweenParsed.indexEnd)
-        assertEquals(4, repeatableBetweenParsed.repeatersParsed.size)
+        assertEquals(0, repeatParsed.indexStart)
+        assertEquals(3, repeatParsed.indexEnd)
+        assertEquals(4, repeatParsed.repeatersParsed.size)
     }
 
     @Test
@@ -99,8 +99,7 @@ class TestParsers {
 
     @Test
     fun testRepeatableBetween() {
-        val repeatableBetweenParsed = RepeatableBetween(Str("["), EnglishLetter(), Str("]"))
-            .parse("[Na]").get()
+        val repeatableBetweenParsed = RepeatableBetween(Str("["), EnglishLetter(), Str("]")).parse("[Na]").get()
         assertEquals(0, repeatableBetweenParsed.indexStart)
         assertEquals(3, repeatableBetweenParsed.indexEnd)
         assertEquals("[", repeatableBetweenParsed.left.str)
@@ -128,15 +127,15 @@ class TestParsers {
 
     @Test
     fun testLong() {
-        val longParsed = Long().parse("1").get()
+        val longParsed = Long().parse("134").get()
         assertEquals(0, longParsed.indexStart)
-        assertEquals(0, longParsed.indexEnd)
-        assertEquals(1L, longParsed.long)
+        assertEquals(2, longParsed.indexEnd)
+        assertEquals(134L, longParsed.long)
     }
 
     @Test
     fun testEnglishLetter() {
-        val englishLetterParsed = EnglishLetter().parse("a").get()
+        val englishLetterParsed = EnglishLetter().parse("abv").get()
         assertEquals(0, englishLetterParsed.indexStart)
         assertEquals(0, englishLetterParsed.indexEnd)
         assertEquals('a', englishLetterParsed.letter)
@@ -144,7 +143,7 @@ class TestParsers {
 
     @Test
     fun testEnglishDigit() {
-        val englishDigitParsed = EnglishDigit().parse("1").get()
+        val englishDigitParsed = EnglishDigit().parse("123").get()
         assertEquals(0, englishDigitParsed.indexStart)
         assertEquals(0, englishDigitParsed.indexEnd)
         assertEquals(1, englishDigitParsed.digit)

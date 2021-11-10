@@ -96,7 +96,7 @@
                         <li class="nav-item"><a class="nav-link" href="#idocs_Beginning">Beginning</a></li>
                         <li class="nav-item"><a class="nav-link" href="#idocs_Between">Between</a></li>
                         <li class="nav-item"><a class="nav-link" href="#idocs_Character">Character</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#idocs_CustomWord>CustomWord</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#idocs_CustomWord">CustomWord</a></li>
 			<li class=" nav-item"><a class="nav-link" href="#idocs_DoubleQuote">DoubleQuote</a></li>
                         <li class="nav-item"><a class="nav-link" href="#idocs_End">End</a></li>
                         <li class="nav-item"><a class="nav-link" href="#idocs_EndOfInputParser">EndOfInputParser</a>
@@ -406,6 +406,163 @@ assertEquals("my.domain.com", document.customWord)
                     </section>
 
                     <hr class="divider">
+
+
+                    <section id="idocs_DoubleQuote">
+                        <h2>DoubleQuote</h2>
+                        <p>Allows to parse symbol <code>"</code> </p>
+                        <pre><code class="language-kotlin hljs">//Kotlin example
+val doubleQuoteParsed = DoubleQuote().parse(""""""").get()
+assertEquals(0, doubleQuoteParsed.indexStart)
+assertEquals(0, doubleQuoteParsed.indexEnd)
+assertEquals(""""""", doubleQuoteParsed.str)
+</code></pre>
+                        <p>Here we parsed single <code>"</code>. Parser returns <code>Str</code></p>
+
+                    </section>
+                    <hr class="divider">
+
+                    <section id="idocs_End">
+                        <h2>End</h2>
+                        <p>Parses end of the document</p>
+                        <p><code>End</code> is useful when we want parse whole document like:</p>
+                        <pre><code class="language-kotlin hljs">//Kotlin example
+val document =  SequenceOf(Beginning(), Repeat(Any(Word(), Spaces(), EnglishDigit())), End()).parse("1 is not a name").get()
+val repeatParserOutput = document.sequence[1] as Repeat<Any.AnyParsed>.RepeatParsed
+val eightParserResultInsideRepeat = repeatParserOutput.repeatersParsed[8].anyOne as Word.WordParsed
+assertEquals("name", eightParserResultInsideRepeat.word)
+</code></pre>
+
+
+                    </section>
+                    <hr class="divider">
+
+
+                    <section id="idocs_EndOfInputParser">
+                        <h2>EndOfInputParser</h2>
+                        <p>Abstruct class supposed to check if there is no end of input</p>
+                        <pre><code class="language-kotlin hljs">//Kotlin
+abstract class EndOfInputParser<T : Parsed> : Parser<T> {
+    override fun parse(previous: Parsed): ParsedResult<T> {
+        return if (previous.currentIndex() > previous.textMaxIndex()) {
+            ParsedResult.asError("Unexpected end of input")
+        } else {
+            parseNext(previous)
+        }
+    }
+
+    abstract fun parseNext(previous: Parsed): ParsedResult<T>
+}
+</code></pre>
+                        <p>Usually inherited by Parses which need to parse 1 or more symbols</p>
+
+                    </section>
+                    <hr class="divider">
+
+
+                    <section id="idocs_EnglishDigit">
+                        <h2>EnglishDigit</h2>
+                        <p>Allows to parse single digit <code>from 1 to 9</code> </p>
+                        <pre><code class="language-kotlin hljs">//Kotlin example
+val englishDigitParsed = EnglishDigit().parse("123").get()
+assertEquals(0, englishDigitParsed.indexStart)
+assertEquals(0, englishDigitParsed.indexEnd)
+assertEquals(1, englishDigitParsed.digit)
+</code></pre>
+                        <p>Here we parsed single <code>1</code> digit. Parser returns <code>EnglishDigitParsed</code></p>
+
+                    </section>
+                    <hr class="divider">
+
+
+                    <section id="idocs_EnglishLetter">
+                        <h2>EnglishLetter</h2>
+                        <p>Allows to parse one letter <code>a-z</code> or <code><code>A-Z</code></code> </p>
+                        <pre><code class="language-kotlin hljs">//Kotlin example
+val englishLetterParsed = EnglishLetter().parse("abv").get()
+assertEquals(0, englishLetterParsed.indexStart)
+assertEquals(0, englishLetterParsed.indexEnd)
+assertEquals('a', englishLetterParsed.letter)
+</code></pre>
+                        <p>Here we parsed single letter <code>a</code>. Parser returns <code>EnglishLetterParsed</code></p>
+
+                    </section>
+                    <hr class="divider">
+
+
+
+                    <section id="idocs_Long">
+                        <h2>Long</h2>
+                        <p>Allows to parse Long like<code>232312324</code> </p>
+                        <pre><code class="language-kotlin hljs">//Kotlin example
+val longParsed = Long().parse("134").get()
+assertEquals(0, longParsed.indexStart)
+assertEquals(2, longParsed.indexEnd)
+assertEquals(134L, longParsed.long)
+</code></pre>
+                        <p>Here we parsed long: <code>134</code>. Parser returns <code>LongParsed</code></p>
+
+                    </section>
+                    <hr class="divider">
+
+
+                    <section id="idocs_Not">
+                        <h2>Not</h2>
+                        <p>Not inverses parser. It doesn't capture end index! Meaning next parser will start from the same index</p>
+                        <pre><code class="language-kotlin hljs">//Kotlin example
+val notA = Not(Str("a")).parse("b").get()
+assertEquals(0, notA.indexStart)
+</code></pre>
+                        <p>Here we parsed not symbol  <code>a</code>. Parser returns <code>NotParsed</code></p>
+
+                    </section>
+                    <hr class="divider">
+
+
+
+                    <section id="idocs_Repeat">
+                        <h2>Repeat</h2>
+                        <p>Repeat specified parsers until fails </p>
+                        <pre><code class="language-kotlin hljs">//Kotlin example
+val repeatParsed = Repeat(EnglishLetter()).parse("Name1").get()
+assertEquals(0, repeatParsed.indexStart)
+assertEquals(3, repeatParsed.indexEnd)
+assertEquals(4, repeatParsed.repeatersParsed.size)
+</code></pre>
+                        <p>Here we parsed <code>N,a,m,e</code> 4 letters. Parser returns <code>RepeatParsed</code></p>
+                        <p>Note that digit is not parsed in the example</p>
+
+                    </section>
+                    <hr class="divider">
+
+
+                    <section id="idocs_RepeatableBetween">
+                        <h2>RepeatableBetween</h2>
+                        <p>Allows to parse and join content between <code>"</code> </p>
+                        <pre><code class="language-kotlin hljs">//Kotlin example
+val repeatableBetweenParsed = RepeatableBetween(Str("["), EnglishLetter(), Str("]")).parse("[Na]").get()
+assertEquals(0, repeatableBetweenParsed.indexStart)
+assertEquals(3, repeatableBetweenParsed.indexEnd)
+assertEquals("[", repeatableBetweenParsed.left.str)
+assertEquals("]", repeatableBetweenParsed.right.str)
+assertEquals(2, repeatableBetweenParsed.between.size)
+assertEquals('N', repeatableBetweenParsed.between[0].letter)
+assertEquals('a', repeatableBetweenParsed.between[1].letter)
+</code></pre>
+                        <p>Here we parsed 2 letters <code>N,a</code> between <code>[</code> and <code>]</code>. Parser returns <code>Str</code></p>
+                        <p>Note that class has <code>joinRepeaters</code> which allows merging result</p>
+                        <pre><code class="language-kotlin hljs">//Kotlin example
+val repeatableBetweenParsed = RepeatableBetween(Str("["), EnglishLetter(), Str("]"))
+    .joinRepeaters { it.map { it.letter }.joinToString(separator = "") }
+    .parse("[Na]").get()
+assertEquals(0, repeatableBetweenParsed.indexStart)
+assertEquals(3, repeatableBetweenParsed.indexEnd)
+assertEquals("Na", repeatableBetweenParsed.between)
+</code></pre>
+                    </section>
+                    <hr class="divider">
+
+
 
                     <!-- Sidebar
                     ============================ -->

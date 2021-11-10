@@ -12,8 +12,8 @@ import kotlin.Long
  * Long allows parsing only long value
  * Example:
  *  aim: we want parse one long value
- *  how to reach:  Long().parse("1").get()
- *  result: successfully parsed long "1".
+ *  how to reach:  Long().parse("134").get()
+ *  result: successfully parsed long "134".
  *
  * @License: Apache-2.0
  * @source: https://github.com/fantaevroman/primeCombinator
@@ -22,15 +22,14 @@ import kotlin.Long
  * @since 2021
  */
 class Long : EndOfInputParser<LongParsed>() {
-    inner class LongParsed(val long: Long, previous: Parsed) : Parsed(previous, previous.currentIndex())
+    inner class LongParsed(val long: Long, text: String, indexStart: Long, indexEnd: Long) :
+        Parsed(text, indexStart, indexEnd)
 
     override fun parseNext(previous: Parsed): ParsedResult<LongParsed> {
-        val scanner = Scanner(previous.text)
-
-        return if (scanner.hasNextLong()) {
-            ParsedResult.asSuccess(LongParsed(scanner.nextLong(), previous))
-        } else {
-            ParsedResult.asError("Can't parse Long")
-        }
+        return Repeat(EnglishDigit())
+            .joinRepeaters { it.map { it.digit.toString() }.joinToString(separator = "").toLong() }
+            .map {
+                LongParsed(it.joined, it.text, it.indexStart, it.indexEnd)
+            }.parse(previous)
     }
 }
