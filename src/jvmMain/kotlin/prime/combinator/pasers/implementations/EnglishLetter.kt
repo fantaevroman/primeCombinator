@@ -11,7 +11,7 @@ import kotlin.Long
  * EnglishLetter allows parsing only english letters (no special symbols)
  * Example:
  *  aim: we want parse one letter
- *  how to reach:  EnglishLetter().parse(startParsing("a")).get()
+ *  how to reach:  EnglishLetter().parse("a").get()
  *  result: successfully parsed letter "a".
  *
  * @License: Apache-2.0

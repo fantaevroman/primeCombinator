@@ -15,7 +15,7 @@ val parsedUrl = SequenceOf(
     Any(Str("http"), Str("https")),
     Str("://"),
     CustomWord(EnglishLetter().asChar(), Character('.')))
-    .parse(startParsing("http://combinator.primeframeworks.com"))
+    .parse("http://combinator.primeframeworks.com")
     .get()
 
 val protocol = (Any().fromSequence(parsedUrl.sequence, 0).anyOne as Str.StrParsed).str

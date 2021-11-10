@@ -9,7 +9,7 @@ import prime.combinator.pasers.implementations.Repeat.RepeatParsed
  * Repeat allows repeat specified parser while it succesfully parsed. Stop on first fail
  * Example:
  *  aim: we want parse all letters
- *  how to reach:  Repeat(EnglishLetter()).parse(startParsing("Name1")).get()
+ *  how to reach:  Repeat(EnglishLetter()).parse("Name1").get()
  *  result: successfully parsed letters "N","a","m","e".
  *
  * @License: Apache-2.0

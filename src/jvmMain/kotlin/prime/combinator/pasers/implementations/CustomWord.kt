@@ -14,7 +14,7 @@ import kotlin.Long
  * CustomWord allows specifying word which consists only from specified characters
  * Example:
  *  aim: we want parse word that has in it only these characters: "a", "b"
- *  how to reach:  CustomWord(Character('a'), Character('b')).parse(startParsing("abc")).get()
+ *  how to reach:  CustomWord(Character('a'), Character('b')).parse("abc").get()
  *  result: successfully parsed word "ab" because text starts with "ab". "c" is not part of the word.
  *
  * @License: Apache-2.0

@@ -11,7 +11,7 @@ import java.util.*
  * RepeatableBetween allows repeat parser included between 2 others.
  * Example:
  *  aim: we want parse all letters between braces, "[Na]"
- *  how to reach:   RepeatableBetween(Str("["), EnglishLetter(), Str("]")).parse(startParsing("[Na]")).get()
+ *  how to reach:   RepeatableBetween(Str("["), EnglishLetter(), Str("]")).parse("[Na]").get()
  *  result: successfully parsed letters "N","a" cause the located between braces.
  *  Parser has joinRepeaters which allows to join repeated parser and get in the example above string "Na" instead
  *  of set of letters. See TestParsers#testRepeatableBetweenJoined

@@ -8,7 +8,7 @@ import kotlin.Long
  * Spaces allows parsing several space at one time
  * Example:
  *  aim: we want to parse string spaces in the beginning of sting "   Name is ..."
- *  how to reach:  Spaces().parse(startParsing("   Name is ...")).get()
+ *  how to reach:  Spaces().parse("   Name is ...").get()
  *
  *  result: spaces presiding "Name" are parsed.
  *

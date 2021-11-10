@@ -8,7 +8,7 @@ import kotlin.Long
  * EnglishDigit allows parsing only digits '1'..'9'
  * Example:
  *  aim: we want parse only digits
- *  how to reach:  EnglishDigit().parse(startParsing("1")).get()
+ *  how to reach:  EnglishDigit().parse("1").get()
  *  result: successfully parsed digit "1".
  *
  * @License: Apache-2.0

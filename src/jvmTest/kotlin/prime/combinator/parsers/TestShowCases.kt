@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test
 import prime.combinator.pasers.Parsed
 import prime.combinator.pasers.implementations.*
 import prime.combinator.pasers.implementations.Any
-import prime.combinator.pasers.startParsing
 import kotlin.test.assertEquals
 
 /**
@@ -24,7 +23,7 @@ class TestShowCases {
             Str("://"),
             CustomWord(EnglishLetter().asChar(), Character('.'))
         )
-            .parse(startParsing("http://combinator.primeframeworks.com"))
+            .parse("http://combinator.primeframeworks.com")
             .get()
 
         val protocol = (Any().fromSequence(parsedUrl.sequence, 0).anyOne as Str.StrParsed).str
@@ -36,23 +35,34 @@ class TestShowCases {
 
     @Test
     fun testCustomParser() {
-        class UrlParsed(val protocol: String, val domain: String, previous: Parsed, indexEnd: Long) :
-            Parsed(previous, indexEnd)
+        class UrlParsed(val protocol: String, val domain: String, mappedFrom: Parsed) : Parsed(mappedFrom, mappedFrom.indexEnd)
 
-        val parsedUrl = SequenceOf(
+        val urlParser = SequenceOf(
             Any(Str("http"), Str("https")),
             Str("://"),
             CustomWord(EnglishLetter().asChar(), Character('.'))
-        ).map {
-            val protocol = (Any().fromSequence(it.sequence, 0).anyOne as Str.StrParsed).str
-            val domainName = CustomWord().fromSequence(it.sequence, 2).customWord
+        ).map { sequenceParserOutput->
+            val protocol = (Any().fromSequence(sequenceParserOutput.sequence, 0).anyOne as Str.StrParsed).str
+            val domainName = CustomWord().fromSequence(sequenceParserOutput.sequence, 2).customWord
 
-            UrlParsed(protocol, domainName, it, it.indexEnd)
-        }.parse(startParsing("http://combinator.primeframeworks.com")).get()
+            UrlParsed(protocol, domainName, sequenceParserOutput)
+        }
 
+        val urlParsed = urlParser.parse("http://combinator.primeframeworks.com").get()
 
-        assertEquals("http", parsedUrl.protocol)
-        assertEquals("combinator.primeframeworks.com", parsedUrl.domain)
+        assertEquals("http", urlParsed.protocol)
+        assertEquals("combinator.primeframeworks.com", urlParsed.domain)
+
+        SequenceOf(Str("url: "), urlParser).parse("url: http://combinator.primeframeworks.com")
+    }
+
+    @Test
+    fun testAny() {
+        val anyParsed = Any(Word(), EnglishDigit())
+            .parse("1 is not a name").get()
+        assertEquals(0, anyParsed.indexStart)
+        assertEquals(0, anyParsed.indexEnd)
+        assertEquals(1, (anyParsed.anyOne as EnglishDigit.EnglishDigitParsed).digit)
     }
 
 }

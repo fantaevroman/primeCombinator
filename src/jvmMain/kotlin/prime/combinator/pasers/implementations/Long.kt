@@ -12,7 +12,7 @@ import kotlin.Long
  * Long allows parsing only long value
  * Example:
  *  aim: we want parse one long value
- *  how to reach:  Long().parse(startParsing("1")).get()
+ *  how to reach:  Long().parse("1").get()
  *  result: successfully parsed long "1".
  *
  * @License: Apache-2.0

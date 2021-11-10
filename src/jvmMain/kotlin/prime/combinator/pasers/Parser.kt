@@ -23,7 +23,9 @@ package prime.combinator.pasers
  */
 interface Parser<S : Parsed> {
     fun parse(previous: Parsed): ParsedResult<S>
-
+    fun parse(str: String): ParsedResult<S>{
+        return parse(startParsing(str))
+    }
 
     fun <A : Parsed> map(
         transformer: (from: S) -> A

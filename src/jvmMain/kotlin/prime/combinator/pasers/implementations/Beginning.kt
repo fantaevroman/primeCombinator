@@ -12,7 +12,7 @@ import kotlin.Long
  * Beginning parser peeks beginning of the text, successful if we just started parse text
  * Example:
  *  aim: we want to make sure we start parsing from the beginning of the text
- *  how to reach: Beginning().parse(startParsing("")).get()
+ *  how to reach: Beginning().parse("").get()
  *  result: successfully parsed because we started to parse empty string from the begninng
  *
  * @License: Apache-2.0

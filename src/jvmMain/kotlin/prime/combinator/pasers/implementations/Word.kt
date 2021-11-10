@@ -9,7 +9,7 @@ import kotlin.Long
  * Word allows parsing any word
  * Example:
  *  aim: we want to parse first word in text "Name is ..."
- *  how to reach: Word().parse(startParsing("Name is ...")).get()
+ *  how to reach: Word().parse("Name is ...").get()
  *
  *  result: Word "Name" is parsed.
  *

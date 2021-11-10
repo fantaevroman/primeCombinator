@@ -11,7 +11,7 @@ import kotlin.Long
  * AnyCharacter parser peeks any character, digit or letter.
  * Example:
  *  aim: we want peek one any character
- *  how to reach: AnyCharacter().parse(startParsing("a")).get()
+ *  how to reach: AnyCharacter().parse("a").get()
  *  result: successfully parsed cause allows any character including "a"
  *
  * @License: Apache-2.0

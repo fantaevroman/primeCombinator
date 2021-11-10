@@ -11,7 +11,7 @@ import kotlin.Long
  * End allows specifying end of the text
  * Example:
  *  aim: we want parse end of text
- *  how to reach:  End().parse(startParsing("")).get()
+ *  how to reach:  End().parse("").get()
  *  result: successfully parsed end of the text because it's empty and we reach end immediately
  *
  * @License: Apache-2.0

@@ -1,0 +1,1543 @@
+Index: src/jvmTest/kotlin/prime/combinator/parsers/TestShowCases.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/jvmTest/kotlin/prime/combinator/parsers/TestShowCases.kt b/src/jvmTest/kotlin/prime/combinator/parsers/TestShowCases.kt
+--- a/src/jvmTest/kotlin/prime/combinator/parsers/TestShowCases.kt	(revision 582e4c1a69116c7a587723a9ec4a0303acc33e36)
++++ b/src/jvmTest/kotlin/prime/combinator/parsers/TestShowCases.kt	(date 1636467430578)
+@@ -36,23 +36,25 @@
+ 
+     @Test
+     fun testCustomParser() {
+-        class UrlParsed(val protocol: String, val domain: String, previous: Parsed, indexEnd: Long) :
+-            Parsed(previous, indexEnd)
++        class UrlParsed(val protocol: String, val domain: String, mappedFrom: Parsed) : Parsed(mappedFrom, mappedFrom.indexEnd)
+ 
+-        val parsedUrl = SequenceOf(
++        val urlParser = SequenceOf(
+             Any(Str("http"), Str("https")),
+             Str("://"),
+             CustomWord(EnglishLetter().asChar(), Character('.'))
+-        ).map {
+-            val protocol = (Any().fromSequence(it.sequence, 0).anyOne as Str.StrParsed).str
+-            val domainName = CustomWord().fromSequence(it.sequence, 2).customWord
++        ).map { sequenceParserOutput->
++            val protocol = (Any().fromSequence(sequenceParserOutput.sequence, 0).anyOne as Str.StrParsed).str
++            val domainName = CustomWord().fromSequence(sequenceParserOutput.sequence, 2).customWord
+ 
+-            UrlParsed(protocol, domainName, it, it.indexEnd)
+-        }.parse("http://combinator.primeframeworks.com").get()
++            UrlParsed(protocol, domainName, sequenceParserOutput)
++        }
+ 
++        val urlParsed = urlParser.parse("http://combinator.primeframeworks.com").get()
+ 
+-        assertEquals("http", parsedUrl.protocol)
+-        assertEquals("combinator.primeframeworks.com", parsedUrl.domain)
++        assertEquals("http", urlParsed.protocol)
++        assertEquals("combinator.primeframeworks.com", urlParsed.domain)
++
++        SequenceOf(Str("url: "), urlParser).parse("url: http://combinator.primeframeworks.com")
+     }
+ 
+ }
+\ No newline at end of file
+Index: documentation/index.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/documentation/index.html b/documentation/index.html
+--- a/documentation/index.html	(revision 582e4c1a69116c7a587723a9ec4a0303acc33e36)
++++ b/documentation/index.html	(date 1636468467369)
+@@ -34,65 +34,46 @@
+     <div></div>
+   </div>
+ </div>
+-<!-- Preloader End --> 
++<!-- Preloader End -->
+ 
+ <!-- Document Wrapper   
+ =============================== -->
+-<div id="main-wrapper"> 
+-  
++<div id="main-wrapper">
++
+   <!-- Header
+   ============================ -->
+-  <header id="header" class="sticky-top"> 
++  <header id="header" class="sticky-top">
+     <!-- Navbar -->
+     <nav class="primary-menu navbar navbar-expand-lg navbar-dropdown-dark">
+       <div class="container-fluid">
+         <!-- Sidebar Toggler -->
+ 		<button id="sidebarCollapse" class="navbar-toggler d-block d-md-none" type="button"><span></span><span class="w-75"></span><span class="w-50"></span></button>
+-		
+-		<!-- Logo --> 
+-        <a class="logo ml-md-3" href="index.html" title="iDocs Template"> <img src="assets/images/logo.png" alt="iDocs Template"/> </a> 
+-		<span class="text-2 ml-2">v1.0</span> 
++
++		<!-- Logo -->
++        <a class="logo ml-md-3" href="index.html" title="iDocs Template"> <img src="assets/images/primeCombinatorLogo.png" alt="iDocs Template" style="width: 40px "/>  </a>
++          <span style="margin-left:15px; font-size:30px">Prime combinator</span>
++		<span class="text-2 ml-2">v1.0</span>
+         <!-- Logo End -->
+-        
++
+ 		<!-- Navbar Toggler -->
+ 		<button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#header-nav"><span></span><span></span><span></span></button>
+-        
++
+ 		<div id="header-nav" class="collapse navbar-collapse justify-content-end">
+           <ul class="navbar-nav">
+-            <li class="dropdown"> <a class="dropdown-toggle" href="#">Dropdown</a>
+-              <ul class="dropdown-menu">
+-                <li><a class="dropdown-item" href="#">Action</a></li>
+-                <li class="dropdown"><a class="dropdown-item dropdown-toggle" href="#">Dropdown Action</a>
+-                  <ul class="dropdown-menu">
+-                    <li><a class="dropdown-item" href="index.html">Action</a></li>
+-                    <li><a class="dropdown-item" href="feature-header-dark.html">Another Action</a></li>
+-                    <li><a class="dropdown-item" href="feature-header-primary.html">Something Else Here</a></li>
+-                    <li><a class="dropdown-item" href="index-2.html">Another Link</a></li>
+-                  </ul>
+-                </li>
+-                <li><a class="dropdown-item" href="#">Another Action</a>
+-                <li><a class="dropdown-item" href="#">Something Else Here</a></li>
+-              </ul>
+-            </li>
+-            <li><a target="_blank" href="https://themeforest.net/user/harnishdesign/portfolio?ref=HarnishDesign">Other Template</a></li>
+-            <li><a target="_blank" href="https://themeforest.net/user/harnishdesign/#contact?ref=HarnishDesign">Support</a></li>
++
++            <li><a target="_blank" href="https://www.linkedin.com/in/roman-fantaev-427b65a2/">Linkedin bio</a></li>
+           </ul>
+         </div>
+-        <ul class="social-icons social-icons-sm ml-lg-2 mr-2">
+-          <li class="social-icons-twitter"><a data-toggle="tooltip" href="http://www.twitter.com/harnishdesign/" target="_blank" title="" data-original-title="Twitter"><i class="fab fa-twitter"></i></a></li>
+-          <li class="social-icons-facebook"><a data-toggle="tooltip" href="http://www.facebook.com/harnishdesign/" target="_blank" title="" data-original-title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+-          <li class="social-icons-dribbble"><a data-toggle="tooltip" href="http://www.dribbble.com/harnishdesign/" target="_blank" title="" data-original-title="Dribbble"><i class="fab fa-dribbble"></i></a></li>
+-        </ul>
+       </div>
+     </nav>
+-    <!-- Navbar End --> 
++    <!-- Navbar End -->
+   </header>
+-  <!-- Header End --> 
+-  
++  <!-- Header End -->
++
+   <!-- Content
+   ============================ -->
+   <div id="content" role="main">
+-    
++
+ 	<!-- Sidebar Navigation
+ 	============================ -->
+ 	<div class="idocs-navigation bg-light">
+@@ -100,14 +81,11 @@
+         <li class="nav-item"><a class="nav-link active" href="#idocs_start">Getting Started</a>
+           <ul class="nav flex-column">
+             <li class="nav-item"><a class="nav-link" href="#idocs_installation">Installation</a></li>
+-            <li class="nav-item"><a class="nav-link" href="#idocs_html_structure">HTML Structure</a></li>
+-            <li class="nav-item"><a class="nav-link" href="#idocs_sass">Sass</a></li>
+-            <li class="nav-item"><a class="nav-link" href="#idocs_color_schemes">Color Schemes</a></li>
+-            <li class="nav-item"><a class="nav-link" href="#idocs_theme_customization">Customization</a></li>
+-            <li class="nav-item"><a class="nav-link" href="#idocs_logo_settings">Logo Settings</a></li>
++            <li class="nav-item"><a class="nav-link" href="#idocs_html_structure">How to use</a></li>
++            <li class="nav-item"><a class="nav-link" href="#idocs_sass">How to create custom parser</a></li>
+           </ul>
+         </li>
+-        <li class="nav-item"><a class="nav-link" href="#idocs_layout">Layout</a>
++        <li class="nav-item"><a class="nav-link" href="#idocs_layout">Available parsers</a>
+           <ul class="nav flex-column">
+ 			<li class="nav-item"><a class="nav-link" href="#idocs_header">Header</a></li>
+ 			<li class="nav-item"><a class="nav-link" href="#idocs_navbar">Navbar</a></li>
+@@ -146,241 +124,146 @@
+ 		</li>
+       </ul>
+     </div>
+-    
++
+     <!-- Docs Content
+ 	============================ -->
+     <div class="idocs-content">
+-      <div class="container"> 
+-        
++      <div class="container">
++
+         <!-- Getting Started
+ 		============================ -->
+         <section id="idocs_start">
+         <h1>Documentation</h1>
+-        <h2>Your ThemeForest Item Name Here</h2>
+-        <p class="lead">Thank you so much for purchasing our item from themeforest.</p>
++        <h2>Prime combinator</h2>
++            <p>Parsing combinator with human-readable syntax</p>
+ 		<hr>
+ 		<div class="row">
+ 			<div class="col-sm-6 col-lg-4">
+ 				<ul class="list-unstyled">
+ 					<li><strong>Version:</strong> 1.0</li>
+-					<li><strong>Author:</strong> <a href="http://www.harnishdesign.net" target="_blank">Harnish Design</a></li>
++					<li><strong>Author:</strong> <a href="https://www.linkedin.com/in/roman-fantaev-427b65a2/" target="_blank">Roman Fantaev</a></li>
+ 				</ul>
+ 			</div>
+ 			<div class="col-sm-6 col-lg-4">
+ 				<ul class="list-unstyled">
+-					<li><strong class="font-weight-700">Created:</strong> 8 April, 2020</li>
+-					<li><strong>Update:</strong> 12 May, 2020</li>
++					<li><strong class="font-weight-700">Created:</strong> 1 November, 2020</li>
+ 				</ul>
+ 			</div>
+ 		</div>
+-        <p class="alert alert-info">If you have any questions that are beyond the scope of this help file, Please feel free to email via <a target="_blank" href="https://themeforest.net/user/harnishdesign/#contact?ref=HarnishDesign">Item Support Page</a>.</p>
++        <p class="alert alert-info">If you have any questions that are beyond the scope of this help page, Please feel free to <a href="mailto:FantaevRoman@gmail.com">email me</a></p>
+         </section>
+-        
++
+ 		<hr class="divider">
+-		
++
+         <!-- Installation
+ 		============================ -->
+         <section id="idocs_installation">
+           <h2>Installation</h2>
+-          <p class="lead">Follow the steps below to setup your site template:</p>
+-          <ol>
+-            <li>Unzip the downloaded package and open the <strong>/HTML</strong> folder to find all the template files. You will need to upload these files to your hosting web server using FTP or localhost in order to use it on your website.</li>
+-            <li>Below is the folder structure and needs to be uploaded to your website or localhost root directory:
+-            <ul>
+-			<li><code>HTML/assets</code> - Contains all of the assets referenced
+-			  <ul>
+-                <li><code>HTML/css</code> - Stylesheet files</li>
+-                <li><code>HTML/images</code> - Images files</li>
+-                <li><code>HTML/js</code> - Javacript files</li>
+-                <li><code>HTML/sass</code> - Sass files</li>
+-                <li><code>HTML/vendor</code> – All external libs.</li>
+-              </ul>
+-			</li>
+-			<li><code>HTML/index.html</code> - Homepage
+-			</ul>
+-            </li>
+-            <li>You should upload all or specific HTML files as per your need.</li>
+-            <li>You are good to go for adding your content now!</li>
+-          </ol>
++          <p class="lead">Library is located at maven central:</p>
++
++           <h5>Maven:</h5>
++<pre><code class="html">&lt;dependency&gt
++     &lt;groupId>com.primeframeworks&lt;/groupId>
++     &lt;artifactId>primeCombinator&lt;/artifactId>
++     &lt;version>1.0.0&lt;/version>
++     &lt;scope>compile&lt;/scope>
++&lt;/dependency>
++</code></pre>
++
++            <h5>Gradle:</h5>
++            <code class="html">
++                implementation com.primeframeworks:primeCombinator:1.0.0
++            </code>
+         </section>
+-        
++
+ 		<hr class="divider">
+-		
++
+         <!-- HTML Structure
+ 		============================ -->
+         <section id="idocs_html_structure">
+-          <h2>HTML Structure</h2>
+-          <p>iDocs follows a simple and easy to customize coding structure. Here is the sample for your reference:<br>
+-            The template is based on <a class="ml-1" target="_blank" href="https://getbootstrap.com/"><i class="fas fa-external-link-alt"></i> Bootstrap Framework</a></p>
+-          <pre><code class="html">&lt;!DOCTYPE html&gt;
+-&lt;html lang=&quot;en&quot;&gt;
+-&lt;head&gt;
++          <h2>How to use</h2>
++          <p>Let's say we need to fetch protocol and domain name from URL.
++              Here is an example how we take it from this address: <a href="http://combinator.primeframeworks.com">http://combinator.primeframeworks.com</a> </p>
++          <pre><code class="language-kotlin hljs">//Kotlin example
+ 
+-&lt;!-- Your Title, Description, Stylesheets
+-============================================= --&gt;
++val parsedUrl = SequenceOf(
++    Any(Str("http"), Str("https")),
++    Str("://"),
++    CustomWord(EnglishLetter().asChar(), Character('.')))
++    .parse("http://combinator.primeframeworks.com")
++    .get()
+ 
+-&lt;/head&gt;
++val protocol = (Any().fromSequence(parsedUrl.sequence, 0).anyOne as Str.StrParsed).str
++val domainName = CustomWord().fromSequence(parsedUrl.sequence, 2).customWord
+ 
+-&lt;body data-spy=&quot;scroll&quot; data-target=&quot;.idocs-navigation&quot; data-offset=&quot;125&quot;&gt;
++assertEquals("http", protocol)
++assertEquals("combinator.primeframeworks.com", domainName)
++</code></pre>
++            <p>In given example we specify that first in text there will either String: <code>"http"</code> or String: <code>"https"</code>.
++                Next goes String:<code>"://"</code>.
++            Then goes word that consists of letters and symbol <code>"."</code> which forms full domain name.</p>
++            <p>Because we parse <code>"sequence"</code> we have a list of results as an output where we know that first element is<code>"Any"</code> and third is <code>"CustomWord"</code>.
++                We use <code>"fromSequence"</code> to convert parsed part into corresponding class and take value.
++                We have to cast <code>Any().fromSequence(parsedUrl.sequence, 0)</code> to <code>Str.StrParsed</code> because Any return "general type" (could be any) but we know that only
++                <code>Str.StrParsed</code> could be returned as that is what <code>Str</code> parser produces.
++            </p>
+ 
+-&lt;!-- Document Wrapper   
+-=============================== --&gt;
+-&lt;div id=&quot;main-wrapper&quot;&gt; 
+-  
+-  &lt;!-- Header
+-  ============================ --&gt;
+-  &lt;header id=&quot;header&quot; class=&quot;sticky-top&quot;&gt;
+-   ......
+-  &lt;/header&gt;
+-  &lt;!-- Header End --&gt; 
+-  
+-  &lt;!-- Content
+-  ============================ --&gt;
+-  &lt;div id=&quot;content&quot; role=&quot;main&quot;&gt; 
+-    
+-    &lt;!-- Sidebar Navigation
+-    ============================ --&gt;
+-    &lt;div class=&quot;idocs-navigation bg-light&quot;&gt;
+-     .....
+-    &lt;/div&gt;
+-    
+-    &lt;!-- Docs Content
+-    ============================ --&gt;
+-    &lt;div class=&quot;idocs-content&quot;&gt;
+-      &lt;div class=&quot;container&quot;&gt;
+-        .......
+-      &lt;/div&gt;
+-    &lt;/div&gt;
+-  &lt;/div&gt;
+-  &lt;!-- Content end --&gt; 
+-  
+-  &lt;!-- Footer --&gt;
+-  &lt;footer id=&quot;footer&quot; class=&quot;section bg-dark footer-text-light&quot;&gt;
+-    &lt;div class=&quot;container&quot;&gt; ...... &lt;/div&gt;
+-  &lt;/footer&gt;
+-  &lt;!-- Footer end --&gt; 
+-  
+-&lt;/div&gt;
+-&lt;!-- Document Wrapper end --&gt; 
+-
+-&lt;!-- JavaScript --&gt;
+-&lt;/body&gt;
+-&lt;/html&gt;</code></pre>
+-          <p class="alert alert-info">If you need more information, please visit bootstrap site: <a target="_blank" href="https://getbootstrap.com/docs/4.4/layout/grid/">https://getbootstrap.com</a></p>
+-        </section>
+-        
+ 		<hr class="divider">
+-		        
++
+ 		<!-- Sass
+ 		============================ -->
+         <section id="idocs_sass">
+-          <h2>Sass</h2>
+-          <p>We have added SASS <code>.scss</code> files in template. If you know how to use SASS you can change sass files and compile the css as well.
+-            You can find sass file here - <code>HTML/assets/sass</code></p>
+-          <p>Open the <code>sass/_variables.scss</code> and Edit the values according to your needs. If you need more Advanced Setup then you can Edit the Respective Files yourself which have been branched inside the same Folder. It is completely at your discretion only to include the Required <code>.scss</code> Files you need to minimize the amount of CSS & including only the Styles of the Blocks you need. This can be setup in your <code>stylesheet.scss</code> File.</p>
+-        </section>
+-        
+-		<hr class="divider">
+-		
+-		<!-- Color Schemes
+-		============================ -->
+-        <section id="idocs_color_schemes">
+-          <h2>Color Schemes</h2>
+-          <p>You can change your Website's Color Scheme in an instant. We have build <strong>10 Color</strong> css file for change template primary color.</p>
+-          <ul>
+-            <li><code>color-blue.css</code> - Blue Color</li>
+-            <li><code>color-brown.css</code> - Brown Color</li>
+-            <li><code>color-cyan.css</code> - Cyan Color</li>
+-            <li><code>color-green.css</code> - Green Color</li>
+-            <li><code>color-orange.css</code> - Orange Color</li>
+-            <li><code>color-indigo.css</code> - Indigo Color</li>
+-            <li><code>color-purple.css</code> - Purple Color</li>
+-            <li><code>color-red.css</code> - Red Color</li>
+-            <li><code>color-teal.css</code> - Teal Color</li>
+-            <li><code>color-yellow.css</code> - Yellow Color</li>
+-          </ul>
+-          <p>Simply add Color CSS file link it in the Document <code>&lt;head&gt;</code>.<br>
+-            Make sure you add the <code>css/color-blue.css</code> stylesheet in your head after the <code>css/stylesheet.css</code> file linking from above mentioned 10 color css file.</p>
+-          <p><strong>For Example:</strong></p>
+-          <pre><code class="html">&lt;head&gt;
+-&lt;!-- Stylesheet
+-============================== --&gt;
+-&lt;!-- Bootstrap --&gt;
+-&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;assets/vendor/bootstrap/css/bootstrap.min.css&quot; /&gt;
+-&lt;!-- Font Awesome Icon --&gt;
+-&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;assets/vendor/font-awesome/css/all.min.css&quot; /&gt;
+-&lt;!-- Magnific Popup --&gt;
+-&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;assets/vendor/magnific-popup/magnific-popup.min.css&quot; /&gt;
+-&lt;!-- Highlight Syntax --&gt;
+-&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;assets/vendor/highlight.js/styles/github.css&quot; /&gt;
+-&lt;!-- Custom Stylesheet --&gt;
+-&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;assets/css/stylesheet.css&quot; /&gt;
+-
+-&lt;!-- Here goes your Colors Css --&gt;
+-&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;assets/css/color-orange.css&quot; /&gt;
+-&lt;/head&gt;</code></pre>
++          <h2>How to create custom parser</h2>
++          <p>It is possible to create custom parser and combine with others. That is where <a href="http://combinator.primeframeworks.com">primeCombinator</a>  shines and gives you ability to create very advance parsing logic with is easy to read.</p>
+         </section>
+-        
+-		<hr class="divider">
+-		
+-		<!-- Customization
+-		============================ -->
+-        <section id="idocs_theme_customization">
+-          <h2>Theme Customization</h2>
+-          <p>We have include a Custom CSS File in the <code>css</code> Folder so that you can better handle your Customizations for New Styles or
+-            Overwriting Default Theme Styles. Simply add all your Custom CSS Codes in the <code>css/custom.css</code> File and link it in the Document <code>&lt;head&gt;</code> after the <code>css/stylesheet.css</code> Linking. Also make sure that this is the Last Linked CSS File in the Document <code>&lt;head&gt;</code> so that your Custom CSS Styles are Overwritten properly.</p>
+-          <pre><code class="html">&lt;head&gt;
+-&lt;!-- Stylesheet
+-============================== --&gt;
+-&lt;!-- Bootstrap --&gt;
+-&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;assets/vendor/bootstrap/css/bootstrap.min.css&quot; /&gt;
+-&lt;!-- Font Awesome Icon --&gt;
+-&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;assets/vendor/font-awesome/css/all.min.css&quot; /&gt;
+-&lt;!-- Magnific Popup --&gt;
+-&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;assets/vendor/magnific-popup/magnific-popup.min.css&quot; /&gt;
+-&lt;!-- Highlight Syntax --&gt;
+-&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;assets/vendor/highlight.js/styles/github.css&quot; /&gt;
+-&lt;!-- Custom Stylesheet --&gt;
+-&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;assets/css/stylesheet.css&quot; /&gt;
++            <pre><code class="language-kotlin hljs">//Kotlin example
++
++class UrlParsed(val protocol: String, val domain: String, mappedFrom: Parsed) : Parsed(mappedFrom, mappedFrom.indexEnd)
++
++val urlParser = SequenceOf(
++    Any(Str("http"), Str("https")),
++    Str("://"),
++    CustomWord(EnglishLetter().asChar(), Character('.'))
++).map { sequenceParserOutput->
++    val protocol = (Any().fromSequence(sequenceParserOutput.sequence, 0).anyOne as Str.StrParsed).str
++    val domainName = CustomWord().fromSequence(sequenceParserOutput.sequence, 2).customWord
+ 
+-&lt;!-- Here goes your custom.css
+-============================================= --&gt;
+-&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;assets/css/custom.css&quot; /&gt;
+-&lt;/head&gt;</code></pre>
+-        </section>
+-        
+-		<hr class="divider">
+-		
+-        <!-- Logo Settings
+-		============================ -->
+-        <section id="idocs_logo_settings">
+-          <h2>Logo Settings</h2>
+-          <p>The Logo Container can be found in the Header Container - <code>&lt;header&gt;</code></p>
+-          <pre><code class="html">&lt;!-- Logo --&gt; 
+-&lt;a class=&quot;logo ml-3 ml-md-0&quot; href=&quot;index.html&quot; title=&quot;iDocs&quot;&gt;
+-   &lt;img src=&quot;images/logo-light.png&quot; alt=&quot;iDocs&quot;/&gt;
+-&lt;/a&gt;
+-&lt;!-- Logo End --&gt;
++    UrlParsed(protocol, domainName, sequenceParserOutput)
++}
++
++val urlParsed = urlParser.parse("http://combinator.primeframeworks.com").get()
++
++assertEquals("http", urlParsed.protocol)
++assertEquals("combinator.primeframeworks.com", urlParsed.domain)
+ </code></pre>
+-        </section>
+-		
+-        
++            <p>Congratulations! Now you have custom parser <code>"urlParser"</code> and can combine it with other Parsers.
++                You can try out: <code class="language-kotlin hljs">SequenceOf(Str("url: "), urlParser).parse("url: http://combinator.primeframeworks.com")</code>
++            </p>
++            <p>
++            <code>Parsed</code> is a general interface for parsers output. We created custom output <code>UrlParsed</code> for custom parser <code>urlParser</code> and made it
++            strictly typed.  <code class="language-kotlin hljs">class UrlParsed(val protocol: String, val domain: String, mappedFrom: Parsed) : Parsed(mappedFrom, mappedFrom.indexEnd)</code> this part is needed to save positions in text from which
++            parser reads. As we're only changing output but not parsing logic we simply copy indexes from output from "mapped" parser.
++                In other words we save  position "a" (where we started parse)  and position "b" (where we stopped parsing) in <code>Parsed</code> core class.
++                You always can simply use this approach for any custom parser without need to "look inside" framework unless you want to.
++            </p>
++
+ 		<hr class="divider">
+-		
++
++
+ 		<!-- Layout
+ 		============================ -->
+         <section id="idocs_layout">
+-          <h2>Layout</h2>
+-          <p class="lead mb-5">Documentation and examples for header, navbar, sidebar, footer</p>
++          <h2>Available parsers</h2>
++          <p class="lead mb-5">Documentation and examples of available parsers out of the box.</p>
+         </section>
+-		
+-		
++
++
+         <!-- Header
+ 		============================ -->
+         <section id="idocs_header">
+           <h2>Header</h2>
+           <p>The list of various header types & its descriptions are provided below for your reference:</p>
+-          
++
+           <h4>Light</h4>
+           <p>Header with white background Color & Dark text. <span class="text-info">See below image and code for more inforamtion.</span></p>
+           <p><a class="popup-img" href="assets/images/header-light.jpg"><img class="img-fluid border" src="assets/images/header-light.jpg" alt=""></a></p>
+@@ -397,7 +280,7 @@
+ &lt;/header&gt;
+ &lt;!-- Header End --&gt;
+ </code></pre>
+-        
++
+           <h4>Dark</h4>
+           <p>Header with dark background & Light text. <span class="text-info">See below image and code for more inforamtion.</span></p>
+           <p><a class="popup-img" href="assets/images/header-dark.jpg"><img class="img-fluid border" src="assets/images/header-dark.jpg" alt=""></a></p>
+@@ -416,9 +299,9 @@
+ &lt;!-- Header End --&gt;
+ </code></pre>
+         </section>
+-		
++
+ 		<hr class="divider">
+-		
++
+ 		<!-- Navbar
+ 		============================ -->
+         <section id="idocs_navbar">
+@@ -445,7 +328,7 @@
+   &lt;/ul&gt;
+ &lt;/div&gt;
+ </code></pre>
+-        
++
+           <h4 class="mt-5">Center Align</h4>
+           <p>Header with Navigation alligned Center. <span class="text-info">See below image and code for more inforamtion.</span></p>
+           <p><img class="img-fluid border" src="assets/images/navbar-center.jpg" alt=""></p>
+@@ -457,9 +340,9 @@
+ &lt;/div&gt;
+ </code></pre>
+         </section>
+-		
++
+ 		<hr class="divider">
+-		
++
+ 		<!-- Sidebar
+ 		============================ -->
+         <section id="idocs_sidebar">
+@@ -550,16 +433,16 @@
+   &lt;/div&gt;
+ &lt;/div&gt;
+ </code></pre>
+-		
++
+ 		<h4>Light Sidebar:</h4>
+         <p>Light background Color & Dark text for light sidebar. See below image and code for more inforamtion.</p>
+-		
++
+ 		<div class="row">
+ 		   <div class="col-lg-6">
+ 			<p><a class="popup-img" href="assets/images/sidebar-light.jpg"><img class="img-fluid border" src="assets/images/sidebar-light.jpg" alt=""></a></p>
+ 		   </div>
+ 		</div>
+-		
++
+ 		<p>Add the <code>.bg-light</code> class to the main sidebar navigation div element to display a light sidebar.</p>
+ 		<pre><code>&lt;!-- Sidebar Navigation
+ ============================ --&gt;
+@@ -569,13 +452,13 @@
+ 
+ <h4>Dark Sidebar:</h4>
+         <p>Dark background Color & Light text for dark sidebar. See below image and code for more inforamtion.</p>
+-		
++
+ 		<div class="row">
+ 		   <div class="col-lg-6">
+ 			<p><a class="popup-img" href="assets/images/sidebar-dark.jpg"><img class="img-fluid border" src="assets/images/sidebar-dark.jpg" alt=""></a></p>
+ 		   </div>
+ 		</div>
+-		
++
+ 		<p>Add the <code>.bg-dark</code> and <code>.docs-navigation-dark</code> class to the main sidebar navigation div element to display a dark sidebar.</p>
+ 		<pre><code>&lt;!-- Sidebar Navigation
+ ============================ --&gt;
+@@ -583,9 +466,9 @@
+   ....
+ &lt;/div&gt;</code></pre>
+ 		</section>
+-		
++
+ 		<hr class="divider">
+-		
++
+         <!-- Footer
+ 		============================ -->
+         <section id="idocs_footer">
+@@ -613,9 +496,9 @@
+ &lt;/footer&gt;
+ &lt;!-- Footer end --&gt;</code></pre>
+         </section>
+-        
++
+ 		<hr class="divider">
+-		
++
+ 		<!-- Box Layout Style
+ 		============================ -->
+         <section id="idocs_box_layout">
+@@ -625,16 +508,16 @@
+ 			  <pre><code class="html">&lt;body class="box" data-spy="scroll" data-target=".idocs-navigation" data-offset="125"&gt;</code></pre>
+           </div>
+         </section>
+-		
++
+ 		<hr class="divider">
+-		
++
+ 		<!-- Content
+ 		============================ -->
+         <section id="idocs_content">
+           <h2>Content</h2>
+           <p class="lead mb-5">Documentation and examples for displaying typography, code, table, image and video and more..</p>
+         </section>
+-		  
++
+ 		<!-- Typography
+ 		============================ -->
+ 		<section id="idocs_typography">
+@@ -675,14 +558,14 @@
+                     </tr>
+                   </tbody>
+                 </table>
+-		
++
+ 		<h3 class="mt-5">Lead</h3>
+ 		<p>Make a paragraph stand out by adding <code>.lead</code></p>
+ 		<p class="lead">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid.</p>
+ 		<pre><code class="html">&lt;p class=&quot;lead&quot;&gt;
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid.
+ &lt;/p&gt;</code></pre>
+-		
++
+ 		<h3 class="mt-5">Inline Text elements</h3>
+ 		<p>You can use the mark tag to <mark>highlight</mark> text.</p>
+ 		<p><del>This line of text is meant to be treated as deleted text.</del></p>
+@@ -692,7 +575,7 @@
+ 		<p><small>This line of text is meant to be treated as fine print.</small></p>
+ 		<p><strong>This line rendered as bold text.</strong></p>
+ 		<p><em>This line rendered as italicized text.</em></p>
+-		
++
+ 		<pre><code class="html">&lt;p&gt;You can use the mark tag to &lt;mark&gt;highlight&lt;/mark&gt; text.&lt;/p&gt;
+ &lt;p&gt;&lt;del&gt;This line of text is meant to be treated as deleted text.&lt;/del&gt;&lt;/p&gt;
+ &lt;p&gt;&lt;s&gt;This line of text is meant to be treated as no longer accurate.&lt;/s&gt;&lt;/p&gt;
+@@ -703,22 +586,22 @@
+ &lt;p&gt;&lt;em&gt;This line rendered as italicized text.&lt;/em&gt;&lt;/p&gt;
+ </code></pre>
+ 		</section>
+-		
++
+ 		<hr class="divider">
+-		
++
+ 		<!-- Code
+ 		============================ -->
+ 		<section id="idocs_code">
+ 		  <h2>Code</h2>
+ 		  <p class="text-4">Documentation and examples for displaying inline and multiline blocks of code</p>
+-		  
++
+ 		  <h3 class="mt-5">Inline code</h3>
+ 		  <p>Wrap inline snippets of code with <code>&lt;code&gt;</code>. <span class="text-info">Be sure to escape HTML angle brackets</span>.</p>
+-		  
++
+ 		  <p>For example, <code>&lt;section&gt;</code> should be wrapped as inline.</p>
+ 		  <pre><code class="html">For example, &lt;code&gt;&amp;lt;section&amp;gt;&lt;/code&gt; should be wrapped as inline.</code></pre>
+-		  
+-		  
++
++
+ 		  <h3 class="mt-5">Code blocks</h3>
+ 		  <p>Use <code>&lt;pre&gt;</code>s for multiple lines of code. <span class="text-info">Once again, be sure to escape any angle brackets in the code for proper rendering</span>. You may optionally add the <code>.pre-scrollable</code> class, which will set a max-height of 340px and provide a y-axis scrollbar.</p>
+ 		  <p><strong>For example:</strong></p>
+@@ -730,26 +613,26 @@
+ &amp;lt;p&amp;gt;And another line of sample text here...&amp;lt;/p&amp;gt;
+ &lt;/pre&gt;&lt;/code&gt;
+ </code></pre>
+-		
++
+ 		<h3 class="mt-5">Syntax highlighter</h3>
+ 		<p>We use <strong><a target="_blank" href="https://highlightjs.org/">Highlight Js</a></strong> for syntax highlight code snippet.</p>
+ 		<p>You can refer more information here: <a class="btn btn-primary" target="_blank" href="https://highlightjs.org/usage/"><i class="fas fa-external-link-alt mr-1"></i> How to use highlight.js</a></p>
+ 		</section>
+-		
++
+ 		<hr class="divider">
+-		
++
+ 		<!-- Table
+ 		============================ -->
+ 		<section id="idocs_table">
+ 		<h2>Table</h2>
+ 		<p class="text-4">Documentation and examples for opt-in styling of tables.</p>
+ 		<p>iDocs is based on Bootstrap 4, so you can easily use Bootstrap's table classes to style your table. <a class="ml-1" target="_blank" href="https://getbootstrap.com/docs/4.4/content/tables/"><i class="fas fa-external-link-alt"></i> Bootstrap Documentation</a></p>
+-		
++
+ 		<h3 class="mt-5">Bordered</h3>
+ 		<pre><code class="html">&lt;table class=&quot;table table-bordered&quot;&gt;
+    .......
+ &lt;/table&gt;</code></pre>
+-		
++
+ 		<table class="table table-bordered">
+   <thead>
+     <tr>
+@@ -780,12 +663,12 @@
+     </tr>
+   </tbody>
+ </table>
+-		
++
+ 		<h3 class="mt-5">Striped</h3>
+ 		<pre><code class="html">&lt;table class=&quot;table table-bordered table-striped&quot;&gt;
+    .......
+ &lt;/table&gt;</code></pre>
+-		
++
+ 		<table class="table table-bordered table-striped">
+   <thead>
+     <tr>
+@@ -818,15 +701,15 @@
+ </table>
+ 		<p><span class="badge badge-danger text-uppercase mr-2">Note</span>You can refer more information in Bootstrap Documentation here: <a class="btn btn-primary" target="_blank" href="https://getbootstrap.com/docs/4.4/content/tables/"><i class="fas fa-external-link-alt mr-1"></i> Bootstrap Documentation</a></p>
+ 		</section>
+-		
++
+ 		<hr class="divider">
+-		
++
+ 		<!-- Icons
+ 		============================ -->
+         <section id="idocs_icons">
+           <h2>Icons</h2>
+           <p><strong>Font Awesome</strong> icon sets are used in iDocs.</p>
+-		  
++
+           <pre><code class="html">&lt;i class=&quot;fas fa-mobile-alt&quot;&gt;&lt;/i&gt;
+ &lt;i class=&quot;fab fa-twitter&quot;&gt;&lt;/i&gt;
+ &lt;i class=&quot;fas fa-credit-card&quot;&gt;&lt;/i&gt;
+@@ -834,27 +717,27 @@
+ </code></pre>
+ <p><span class="badge badge-danger text-uppercase mr-2">Note</span>Please go to their official documentation pages for a full list of icons: <a class="btn btn-primary" target="_blank" href="https://fontawesome.com/icons"><i class="fas fa-external-link-alt mr-1"></i> Font Awesome</a></p>
+         </section>
+-		
++
+ 		<hr class="divider">
+-		
++
+ 		<!-- Image
+ 		============================ -->
+         <section id="idocs_image">
+           <h2>Image</h2>
+-          <p class="text-4">Documentation and examples for opting images into responsive behavior and add lightweight styles to them—all via classes.</p> 
+-          
++          <p class="text-4">Documentation and examples for opting images into responsive behavior and add lightweight styles to them—all via classes.</p>
++
+ 		  <h3 class="mt-5">Responsive Images</h3>
+ 		  <p>Images in Bootstrap are made responsive with <code>.img-fluid.</code> <code>max-width: 100%;</code> and <code>height: auto;</code> are applied to the image so that it scales with the parent element.</p>
+ 		  <p><img src="assets/images/screenshot.jpg" class="img-fluid" alt="Responsive image"></p>
+           <pre><code class="html">&lt;img src=&quot;assets/images/screenshot.jpg&quot; class=&quot;img-fluid&quot; alt=&quot;Responsive image&quot;&gt;</code></pre>
+-		  
++
+ 		  <h3 class="mt-5">Image lightbox</h3>
+ 		  <p>Show image popup when click on image:</p>
+ 		  <p><a class="popup-img" href="assets/images/screenshot.jpg"><img src="assets/images/screenshot-thumb.jpg" class="img-fluid img-thumbnail" alt="image"></a></p>
+ 		  <pre><code class="html">&lt;a class=&quot;popup-img&quot; href=&quot;assets/images/screenshot.jpg&quot;&gt;
+   &lt;img src=&quot;assets/images/screenshot-thumb.jpg&quot; class=&quot;img-fluid img-thumbnail&quot; alt=&quot;image&quot;&gt;
+ &lt;/a&gt;</code></pre>
+-		  		  
++
+ 		  <h3 class="mt-5">Image Lightbox with Link</h3>
+ 		  <p>Show image popup when click on link: <a class="popup-img" href="assets/images/screenshot.jpg">Click Here for Popup Image</a></p>
+ 		  <pre><code class="html">&lt;a class=&quot;popup-img&quot; href=&quot;assets/images/screenshot.jpg&quot;&gt;Click Here for Popup Image&lt;/a&gt;</code></pre>
+@@ -863,15 +746,15 @@
+ 		  <p>Show image popup when click on button: <a class="btn btn-primary popup-img" href="assets/images/screenshot.jpg">Click Here for Popup Image</a></p>
+ 		  <pre><code class="html">&lt;a class=&quot;btn btn-primary popup-img&quot; href=&quot;assets/images/screenshot.jpg&quot;&gt;Click Here for Popup Image&lt;/a&gt;</code></pre>
+         </section>
+-		
++
+ 		<hr class="divider">
+-		
++
+ 		<!-- Video
+ 		============================ -->
+         <section id="idocs_video">
+           <h2>Video</h2>
+-          <p class="text-4">Create responsive video embeds based on the width of the parent by creating an intrinsic ratio that scales on any device.</p> 
+-          
++          <p class="text-4">Create responsive video embeds based on the width of the parent by creating an intrinsic ratio that scales on any device.</p>
++
+ 		  <h3 class="mt-5">Embedded Video</h3>
+ 		  <p>Wrap any embed like an <code>&lt;iframe&gt;</code> in a parent element with <code>.embed-responsive</code> and an aspect ratio. The <code>.embed-responsive-item</code> isn’t strictly required, but we encourage it.</p>
+ 		  <div class="embed-responsive embed-responsive-16by9">
+@@ -881,25 +764,25 @@
+   &lt;iframe class=&quot;embed-responsive-item&quot; src=&quot;https://www.youtube.com/embed/7e90gBu4pas&quot; allowfullscreen&gt;&lt;/iframe&gt;
+ &lt;/div&gt;</code></pre>
+ 		  <p><span class="badge badge-danger text-uppercase mr-2">Note</span>Please go to official bootstrap documentation for a full information of embed video: <a class="btn btn-primary" target="_blank" href="https://getbootstrap.com/docs/4.4/utilities/embed/"><i class="fas fa-external-link-alt mr-1"></i> Bootstrap Documentation</a></p>
+-		  
++
+ 		  <h3 class="mt-5">Popup with Video</h3>
+ 		  <p>Show <strong>Youtube</strong> and <strong>Vimeo</strong> video popup when click on link:</p>
+ 		  <p><a class="popup-youtube" href="http://www.youtube.com/watch?v=7e90gBu4pas">Open Popup YouTube Video </a></p>
+ 		  <pre><code class="html">&lt;a class=&quot;popup-youtube&quot; href=&quot;http://www.youtube.com/watch?v=7e90gBu4pas&quot;&gt;Open Popup YouTube Video &lt;/a&gt;</code></pre>
+-		  
++
+ 		  <p><a class="popup-vimeo" href="https://vimeo.com/45830194">Open Popup Vimeo video</a></p>
+ 		  <pre><code class="html">&lt;a class=&quot;popup-vimeo&quot; href=&quot;https://vimeo.com/45830194&quot;&gt;Open Popup Vimeo video&lt;/a&gt;</code></pre>
+         </section>
+-        
++
+ 		<hr class="divider">
+-		
++
+         <!-- Components
+ 		============================ -->
+         <section id="idocs_components">
+           <h2>Components</h2>
+           <p class="mb-5">Setting up components is very easy. Here is the Some of shortcodes describe. also, <strong>iDocs</strong> is based on Bootstrap 4, so you can easily use Bootstrap's components:  <a class="ml-1" target="_blank" href="https://getbootstrap.com/docs/4.4/components/"><i class="fas fa-external-link-alt"></i> Bootstrap Documentation</a></p>
+         </section>
+-		  
++
+ 		  <!-- Accordion
+ 		  ============================ -->
+ 		  <section id="idocs_accordion">
+@@ -963,9 +846,9 @@
+ </table>
+ </div>
+           </section>
+-          
++
+ 		  <hr class="divider">
+-		  
++
+ 		  <!-- Tabs
+ 		  ============================ -->
+ 		  <section id="idocs_tabs">
+@@ -973,7 +856,7 @@
+             <p class="text-4">Default <a href="https://getbootstrap.com/docs/4.4/components/navs/#javascript-behavior">Bootstrap Nav</a> component combined with iDocs for unique tabs.</p>
+ 			<p>See below image and code for more inforamtion.</p>
+ 			<p><a class="popup-img" href="assets/images/tabs.jpg"><img class="img-fluid border" src="assets/images/tabs.jpg" alt=""></a></p>
+-			
++
+             <pre><code class="html">&lt;ul class=&quot;nav nav-tabs&quot; id=&quot;myTab&quot; role=&quot;tablist&quot;&gt;
+   &lt;li class=&quot;nav-item&quot; role=&quot;presentation&quot;&gt;
+     &lt;a class=&quot;nav-link active&quot; id=&quot;home-tab&quot; data-toggle=&quot;tab&quot; href=&quot;#home&quot; role=&quot;tab&quot; aria-controls=&quot;home&quot; aria-selected=&quot;true&quot;&gt;Home&lt;/a&gt;
+@@ -990,7 +873,7 @@
+   &lt;div class=&quot;tab-pane fade&quot; id=&quot;profile&quot; role=&quot;tabpanel&quot; aria-labelledby=&quot;profile-tab&quot;&gt;This is Tab Content Profile&lt;/div&gt;
+   &lt;div class=&quot;tab-pane fade&quot; id=&quot;contact&quot; role=&quot;tabpanel&quot; aria-labelledby=&quot;contact-tab&quot;&gt;This is Tab Content Contact&lt;/div&gt;
+ &lt;/div&gt;</code></pre>
+-            
++
+ 			<h4>Options:</h4>
+             <div class="table-responsive">
+ 			<table class="table table-bordered">
+@@ -1030,14 +913,14 @@
+   .......
+ &lt;/ul&gt;</code></pre></td>
+     </tr>
+-	
++
+   </tbody>
+ </table>
+ </div>
+           </section>
+-          
++
+ 		  <hr class="divider">
+-		  		  
++
+           <!-- Social Icon
+ 		  ============================ -->
+ 		  <section id="idocs_social_icon">
+@@ -1102,20 +985,20 @@
+   .......
+ &lt;/ul&gt;</code></pre></td>
+     </tr>
+-    
++
+   </tbody>
+ </table>
+ </div>
+           </section>
+-		  
++
+ 		  <hr class="divider">
+-		  
++
+ 		  <!-- Helper Classes
+ 		  ============================ -->
+           <section id="idocs_helper_classes">
+             <h3>Helper Classes</h3>
+             <p>We have created some really useful helper classes for you. Here are a few of them. also, You can refer other default bootstrap helper classes here: <a class="ml-1" target="_blank" href="https://getbootstrap.com/docs/4.4/utilities/"><i class="fas fa-external-link-alt"></i> Bootstrap Documentation</a> </p>
+-			            
++
+ 			<h5>Text Size:</h5>
+             <ul>
+               <li><code>.text-0</code> - Changes the Font size to 11px.</li>
+@@ -1196,16 +1079,16 @@
+             <h5>Borders, Sizing, Spacing (margin & padding) and also much more....</h5>
+             <div class="alert alert-info">You can refer for use other default bootstrap helper classes here - <a href="https://getbootstrap.com/docs/4.4/utilities/">https://getbootstrap.com/docs/4.4/utilities/</a></div>
+           </section>
+-        
+-        
++
++
+ 		<hr class="divider">
+-		
++
+ 		<!-- FAQ
+ 		============================ -->
+ 		<section id="idocs_faq">
+           <h2>FAQ</h2>
+           <p class="text-4">A FAQ is a list of frequently asked questions (FAQs) and answers on a particular topic.</p>
+-          
++
+ 		  <div class="row">
+           <div class="col-lg-12">
+             <div class="accordion accordion-alterate arrow-right" id="popularTopics">
+@@ -1260,11 +1143,11 @@
+             </div>
+           </div>
+         </div>
+-          
++
+         </section>
+-        
++
+ 		<hr class="divider">
+-        
++
+         <!-- Source & Credits
+ 		============================ -->
+         <section id="idocs_source_credits">
+@@ -1286,9 +1169,9 @@
+             <li>Magnific Popup - <a target="_blank" href="http://dimsemenov.com/plugins/magnific-popup/">http://dimsemenov.com/plugins/magnific-popup/</a></li>
+           </ul>
+         </section>
+-        
++
+ 		<hr class="divider">
+-		
++
+ 		<!-- Support
+ 		============================ -->
+         <section id="idocs_support">
+@@ -1305,15 +1188,15 @@
+ 			Thank You.
+           </div>
+         </section>
+-		
++
+ 		<hr class="divider">
+-		
++
+ 		<!-- More Templates
+ 		============================ -->
+         <section id="idocs_templates">
+           <h2>More Templates</h2>
+           <p class="lead">Checkout Our Below Premium Templates</p>
+-		  
++
+ 		  <div class="row">
+ 		  <div class="col-4 my-3 text-center">
+ 			<a target="_blank" href="https://themeforest.net/item/x/28476751?ref=HarnishDesign"><img class="img-fluid border" src="assets/images/templates/simone.jpg" alt="">
+@@ -1330,7 +1213,7 @@
+ 			<h6 class="pt-2">Doon - One Page Parallax HTML Template</h6>
+ 			</a>
+ 		  </div>
+-		  
++
+ 		  <div class="col-4 my-3 text-center">
+ 			<a target="_blank" href="https://themeforest.net/item/x/27172933?ref=HarnishDesign"><img class="img-fluid border" src="assets/images/templates/domainx.jpg" alt="">
+ 			<h6 class="pt-2">DomainX- Domain for Sale HTML Template</h6>
+@@ -1346,7 +1229,7 @@
+ 			<h6 class="pt-2">Koice - Invoice HTML Template</h6>
+ 			</a>
+ 		  </div>
+-		  
++
+ 		  <div class="col-4 my-3 text-center">
+ 			<a target="_blank" href="https://themeforest.net/item/x/24017808?ref=HarnishDesign"><img class="img-fluid border" src="assets/images/templates/payyed.jpg" alt="">
+ 			<h6 class="pt-2">Payyed - Money Transfer and Online Payments HTML Template</h6>
+@@ -1358,21 +1241,21 @@
+ 			</a>
+ 		  </div>
+ 		  </div>
+-		  
++
+ 		  <p class="text-center"><a class="btn btn-lg btn-primary my-4" target="_blank" href="https://themeforest.net/user/harnishdesign/portfolio?ref=HarnishDesign">Our Portfolio</a></p>
+-          
++
+         </section>
+-		
++
+ 		<hr class="divider">
+-		
++
+         <!-- Changelog
+ 		============================ -->
+-		
++
+         <section id="idocs_changelog">
+           <h2>Changelog</h2>
+           <p class="text-4">See what's new added, changed, fixed, improved or updated in the latest versions. </p>
+ 		  <p class="alert alert-info mb-5"> For Future Updates Follow Us <a target="_blank" href="http://themeforest.net/user/harnishdesign?ref=HarnishDesign">@themeforest</a> / <a target="_blank" href="http://facebook.com/harnishdesign">@facebook</a> / <a target="_blank" href="http://twitter.com/harnishdesign">@twitter</a> / <a target="_blank" href="https://dribbble.com/harnishdesign">@Dribbble</a></p>
+-          
++
+ 		  <h3 id="v1-1">Version 1.1 <small class="text-muted">(12 Oct, 2020)</small></h3>
+           <ul class="changelog">
+             <li><span class="badge badge-success">Added</span> Your information here for added new feature</li>
+@@ -1382,19 +1265,19 @@
+ 			<li><span class="badge badge-info">Updated</span> Bootstrap to Latest Version</li>
+ 			<li><span class="badge badge-info">Updated</span> Improvements in CSS and JS</li>
+           </ul>
+-		  
++
+ 		  <hr class="divider">
+-		  
++
+           <h3 id="v1-0">Version 1.0 <small class="text-muted">(8 April, 2020)</small></h3>
+           <p>Initial Release</p>
+-        </section>        
+-        
++        </section>
++
+       </div>
+     </div>
+-	
++
+   </div>
+-  <!-- Content end --> 
+-  
++  <!-- Content end -->
++
+   <!-- Footer
+   ============================ -->
+   <footer id="footer" class="section bg-dark footer-text-light">
+@@ -1410,23 +1293,23 @@
+     </div>
+   </footer>
+   <!-- Footer end -->
+-  
++
+ </div>
+-<!-- Document Wrapper end --> 
++<!-- Document Wrapper end -->
+ 
+-<!-- Back To Top --> 
+-<a id="back-to-top" data-toggle="tooltip" title="Back to Top" href="javascript:void(0)"><i class="fa fa-chevron-up"></i></a> 
++<!-- Back To Top -->
++<a id="back-to-top" data-toggle="tooltip" title="Back to Top" href="javascript:void(0)"><i class="fa fa-chevron-up"></i></a>
+ 
+ <!-- JavaScript
+ ============================ -->
+-<script src="assets/vendor/jquery/jquery.min.js"></script> 
+-<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script> 
++<script src="assets/vendor/jquery/jquery.min.js"></script>
++<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+ <!-- Highlight JS -->
+-<script src="assets/vendor/highlight.js/highlight.min.js"></script> 
+-<!-- Easing --> 
+-<script src="assets/vendor/jquery.easing/jquery.easing.min.js"></script> 
+-<!-- Magnific Popup --> 
+-<script src="assets/vendor/magnific-popup/jquery.magnific-popup.min.js"></script> 
++<script src="assets/vendor/highlight.js/highlight.min.js"></script>
++<!-- Easing -->
++<script src="assets/vendor/jquery.easing/jquery.easing.min.js"></script>
++<!-- Magnific Popup -->
++<script src="assets/vendor/magnific-popup/jquery.magnific-popup.min.js"></script>
+ <!-- Custom Script -->
+ <script src="assets/js/theme.js"></script>
+ </body>
+diff --git a/documentation/assets/images/primeCombinatorLogo.png b/documentation/assets/images/primeCombinatorLogo.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..011ca0e4c39b2e8f12f0f58e5a90149b8ed34bb9
+GIT binary patch
+literal 25421
+zc$`#v1z1#F7w(y%qz37s5m2NDK{^FRBozq(>5v|}VQ7#NP(sq8B&B-@L8QB3knW*}
+zzT@}*-@X6kdFDCi?7jB8*Is+=cdd0eQJU&Xq(t;Y0059GKUI7I0AS$n?-oAxa^y97
+zj=kWzK2m;p3;XAH%OVo{ObCDa$`t^JDgXXJz{d<Iwvo>5v7Vcjla-sNsf#7x>FLRD
+z<7nq<ZVI>LcXF{#-<6^V09HU*QU0Y@#`c_N#>=s*oBfH*DSZ1c{A2jstdnJ3sV2%)
+zkKf+SUDwq*vQr)9xM$lObvO5os+qmAsu{(SK;NUP4!yD()<`0@r=<<=Uwgcw@$g)|
+zyoPG(RnMl?oz6;n&JT2jM7Zpx4V>{x3az;gI6&Aa94plB%xpv}$mXzwKO^}dr@_b_
+z^o)cW>Vq2eUki+ey#(;&9;ZisgA&bDRsjZrzLjGjLdI&7H~92H4jeYKbvsM4g0?{t
+ziKBzR@repdi$*s0TS6nfei2H55*klFZ>WGmoT0&{ER6U`7BEQ2Q?(QSpk|h1QKpXl
+zhPj;+=?e$I7C{Qt!LdV(A&Jb2z&b+XQ|k{tM|!E^AtJMxA2^>_vXHdHNbtfJVN~rf
+zll$S0JI(z0QS&okq+0epl!6H%`i|AwP1o5wTD@*H_2HFBw#0kX0GpBb6bVQFQ$`5r
+z2{;0Xz>$6=`Y9q0SXUJ)_-rB*j@OYI-wqb}@$N7)v`1C(D-JiHIQ(#iDsh>W#2gj_
+z>O{eD2c_L8JsoKQreix0jky<bL=CL*r^hO6ergq~VGdaCt1DTW7y&F1w~Jy)jHC--
+zhf!6|$l6nS3KJtv&MU#ha4$-)Ok5{4J+a#@`LE{KIXq75xj6fykerAmK}NjyJ7WU&
+zl$At?lTn--JR{Cd9;(9!oD!t`O4LzO)Ij2bk%%RgD=(ZI&ITvh_J}f^yk|xYOm#dn
+z!2l5{f>H{1D%_}pmxZvR#zqh4?k_8%gc;RwAUGL=YPF_zo(<BO0j*unz=w#usC{8)
+zBdel{IZKX&j6AU1XQw!El6LE$5m?5p_uFHf_LPp3({qj*dBzyChaiDPv@n_~PkgUF
+zhC4CoCGhm9_rcwla5floyP`>Ue07+ES>FebnwgOe+Ht*xbMYc1nhFhlELA)PilV0m
+zC`g@B=cyim#2Cb=72-WE{y*`ZQ#;)2kam*9UX+`4MbA^VPv5|DE)(`65zr;Ln9~|X
+zi~9WGcdU1~orgWtnYf}rZb6yxng6(1XZGZ?efo?Q?rF$<OVi)A=!e23DgO%(?mPY$
+zej_#wFaj~Nbt}ZUiqta7bHKR)j!Ud{);nJzALmG4$^B=UdghigR^axn4h+xC83Co+
+z0Ekc&tGRlGDo9$KsrKDyw_n}<U`Bp*!(5hnOIhcERj-3sFA{x|zqa7x5fqw01Q4cp
+zubL$KWkFL++)e`C{EO=?yDEV)MFsT3=bg{E$rlQMcPKt#OJP?~xC)GM!7;l`E%I!9
+z*TYxhs*S#9LC_d<tx9-fR#Y)&iA!#rkCkpT4^LV)W8}y40WYRwMziMsu|;yGAOj*0
+zg=SFqT&;`Y_`^jFm`(U;DFzcl`R}^lTuFyH{L%9D`HvY+y8MVS(xg(q&eW5zW_zUt
+zV)f`1#Nk@rg7W_ytZ5H0{eQqZaPx5!jI?vW7hmE?Qf{Eb_^>xY%<#!3Mf0dMM)Kkj
+z$xKJy$x(IQh(J+!FiQnpYFs;0#$w~@!5Etj7I<FhUMKio63PHc=<Bq%U1dvV*)X%S
+zaYSra1dly?0P#fQkJNT6*JE{lO9brq`)P$Pf=MQD+J!z^w2AB&NH_ggIIfPW{k7Yg
+zjP(1bjo5wuQ8V~{s4XRE4;&(6s|&iF`R^VtGFQ-JnEEb1DywJq{9@aA0b)%{ck(gC
+z(1bgIseK*(SGG>jiV5PGuso5mGFs0lZ$XB22mihF`N{(|#u6~Mbmsr3f+77#*$3z;
+z#nPIOV)<7UJVfnj(1wE00&C}3>f8xN8&GWd*E9L!Y$o5fXTMp=Q-v44j=S%zj)!n_
+zXy*C}$Ae7l3GVNG2D6^;IM)1QH5c#R*F4~`%b1Z2K7OTSDXhy&h%8WnXmMo0g+;0l
+z{&zQoJ7;lc)yZ~8wQ+{YsevCguW}L1hQaNmNL2i^Hn8mUuW{eR)=|`^IY{LwQK%Sj
+z0~Q*@y#>$!yqI~rbRxv1!#~I0G?uzgkd|U;CdM_(jZXdmK?EqLIX(FUmxS>TD&MoG
+z%$^>Z`NzTE9;AkMMY=v*%DBtVt{hqb{PJW;m9IQ7XXFQ)$(1FkPTrHL%B%Sg=9Qo)
+z3eE|UHO<i4d+=HD9TCD0%bvrTr8qT!rLVmfDCZ<D)ak*YjLvmT9br44uycGr*)I)l
+z;9$tll}K>64fbPhhZ`83PbgEjs*|N75MMPkGwe(2kLEYNOa2MWn$0VsV6$S4^p+Fj
+zOe<UY`mg&Pc=mR|47;cLAEcBfGv<L=S$ajnj!+FqvY^EH>2|U1P(IFowfwMPE&>vL
+z{<{>qRaqayCjJahZj|pqL=q|<nc7qx=A1}qpl++-^v^j|F$Xt>EPl_}xty@%=$7XO
+zKHGlSc)~6Uo-m25nc<AVF5l(FzlV$7HAM#{O11AVvn5;~b6;E$PmYT30cXN88B$&j
+zbB~f5sGIoj`BpKn-l=%cks>(c-D&x<n;Z*lkyh|EZ3gBSI~Q1Eny&g1ST_3aj`GG%
+z1+YX!*etr-lT0^!lJYJZFB9QqQBJ2Jv}amNMeV`%=V7}y6)Zb#^>dCExzn4^zud8V
+zgxo_^AWnGB%XZXk@mNp)<slnYQUBbLwv~*fB3JRm(04k3%M^hX1uXt`QcGkc6Xksi
+z&`2MiJSSV)2$3AWzGeMTM=`Wy)-GKK7~NI+zbd6UW)n>HPlzu}ZMwW9B*d=G>XZ0e
+zvA}ltyRB{+`=lr$#H`(aeeIi|P*fF3gusJ&@4l5^6krM5cRVr9dKM*Yojj?TDW_49
+zq3zdDBa8aFs0h`IQ>KK$A?(z8W+!)Aje|6HhDxY`su|n=2Nr!?K7kO}Oam|GQ6tI>
+z?ECL_8&0cVv#~9@NkLrGY?`5NY{TNkK<Jp67GxI3@RmhQ4NG;Ca`FG#H0@Q<$yL~n
+zpBCq>@FXGxOy3rAua(MVS;+zGfXo*ED;H<nax0=cW2blEL86yx1kh$xE}qWeRCci}
+zz?RqmX+zVG^wwc5=KBJ4o2IklmA&InQ+iEuHwiX2X72XIJ65TZX_iF6>Q7#{-C`w?
+zf%!-7dorqD<QMP!NQZ#(rGNd)O7ub%db`FqV6^x>v9VWAl6h_LSl>kVC3KwaF=Kb<
+zshdAhYM-#H{b1CxBsCy^K4_>IlM-|lto~TB<8!N6Bhu}#Du=S$S_1cW=+9heM1%9w
+zrn5QTnXTK1=@9$>G2n-dEmE@KUdxO<VN3DEugZ7`2cAAT{ZxF$tLIpjKy~T(uKi0=
+z!d6!0KYXtks9*^~na8i<?%5390n%lJzr0y|=#hQ-SaDfTKdtYjs~1))tdCdo3g+!f
+z&9`U_7DPsd4zijx{vvUGg6$)w21IxTQ&4E!`etLruR@kkD_EZ)jT_sU93CPY>knp*
+zZHpRmrh^-ik;@1$V?Y;)D`)4r)I*jHmI;AqH9_ZHf)hVBom|e{4Gy^~f~o&|maJ%c
+zvL|F!#c2h{r?M<*h9SiO#`MF+W01yTPM7K1NQ+&mP4DEiT#dmfMQngBErt;c{^t3*
+z>v5NjZAv_dqf~H&5$iI~zkrb{Dt&?+-b_$tH*PjI@&_>-0)k^Pgc1q&pMy{zELTUw
+zq)3lQC8)_0ZWXe19;%9(hp2OKzXZHY!|3AMljOYrE?QBK3k?<Ovkq40AbJT{*oB=@
+zgmcL$|Ls~1+T}>=78c@KS9HlFLfG>PEwrI^b6D43Dk>g4C5POYeLOS7+Ufx{kf!h0
+z9Nk_z*hHnM7_52gGPYoqN1ikBI~LI_td0ibJ!pf)s}q9+niSSaVDS=&5N^dVQBVzj
+zW_V;IfI`6uM*3p0L+oAxU(LVO;SHv%DstG9hzj<-S>we9^jUq!fZ#;}`Mf)9Y)tjZ
+z8>>q4oC!QHf!gxn+2Hom5OoDb#d;IWosnL5`Md<;mw=n)hdOy*>^T!(u~rpbfJj7@
+zX@LgQKCDVY9U&5=<mAdpi?phu#>5h_Fl<Kx^{Oq3_8)jUXV|5VDDh@0HmNOw(e5^O
+z$77W*5ks?%^kQ--3EAg<mK1-m0;6v=EX+?-jtGp1%#?2B^Tq7Q$7K@iNE4&p?ZWb*
+z+<ywx+=~kw3@8h3O6Ngie1oY^T{BewhDSMb8nAz~%(d35)brq7=7>K~;k%|w5KInv
+zvSUSR`ix#c(|r15AN1aXZtvkPdzUyO#9Xlmr@0s7$ZD$$H?UnvAnu_!LqOGr=WqJR
+zNvxdl55MewETLXK6OBX2Pqngq!d3gQGlNfK-<8=rlFGBqAzVRUxJ?wv#L5U5M{&YE
+zA`013_McJ%BZZ5L?r5J(&pON5u7L?(T3-f;HLTTpDDR(HU+biqBdmj77;_p^1Ka>_
+zWlGngZ^)uSNKQip!THBTSPf|29<gS-cqZ}YjZ>8z9`KI4Htv3imTx=Z2e=#Fk$^{9
+zh>C_IVvD9tl5}Hbwcgl`2te>b)lCx*lgXx*8L0uFr|-JMn`xZ@BY9Q`Xo66#7s}LV
+zG<;omQr?)Xir(uB^K}y)^Bl0Zr~k2k37lhnCu5Gb^E9NqDJLatL17rFk%Ekk*19PL
+z=V&oFi)9h^M=)C_xxNI79yB3zgF<9&wLrI3eczcYeZBgAwK)GtlWLIDH-KI02k5$5
+z#(f<dhPZ)eOK`_Pu@>2kVdA%7i6$TYhlUstdk6Qk;7eWrpm~8L#3o-pscQY*dtj4h
+zuFn~qK}n}?bpH#Sa}{{rY7E&l@df5>5eubZH@c)V52RI5)y8so$W)hFw_ASAvhS(g
+zt|%C?rfyj`(jn{Uv76j7De$7h8oIWPzMr0v)Pjc)gxGlj?P0!7TYvVZDhvLaL*XLI
+z61}~SI=PgrD8So&jdNNQPRiHd@M{Rnx{IvSMmJrdez~OV^EUX38;UPH?z-d$fa`AD
+zX2cRE&GJncdaEsQY?TvvTCCB`4PcM|tPy?0W2H8Pa6cQ_BQ1*SMo2(2g^oSv8WG|T
+z)X(y^pS7%5PI`|R=p&55>ZRw9G9CbRv`TbMB1mvi51;|;dQ${v$tJV?w1Ip8U3-=5
+zkLtX`bVT-vCW#x@(U52>{dFTN3e38S6u&}^hq##kSy%~q0zH028v(|i?$2U|ZMbV7
+zjn6CZE_nc*G>s)R)w^k9Y&gm~VeRT4I%y6ovmkl@Q*xcf%zzTz^8r5dc63uN0?Z5a
+zZxYMO-goZ{;6I<1M0aUtx@m&SRES}5QT;+$k9$F9?mQ@WD-MX()Wfsr<yu$Ywbf;^
+z0tH&pU9#x7i0E^I%)TuA6r{0IYcIQt=K(>jScFbESm&11Z($)UE7||f2AkB;$pv!;
+z{l+@Q{_m-#;C@!$km$vr1lZx==nX*uGHB~G;xT7i7*0svPvS1!N3uJ+wc3zglr!ZI
+zmr>cX=K!zJT`CyUBqx?78;7Ow&3S_R+a#@zgFNHI1n`cIB^wDEU4$>)pl;E>M9q7H
+zgwF9YAFEHr)8rn664p{xv9mcH@>4mJL6iuv%$Ne%O_mUne#T9VYE6Jy3LjO&38bH9
+z-f|z4fvt&&-Ft*L#vhT4mnq*b9%r>nB0<Q&c5*xvSGD>A#e?OtKUMPN^Ga!>wDS`5
+zar<Wy7jMB{%P`Dw>(JDelbxpWgujJAir|=Hz<lJoK|r4NDwM<%4?8W3kK)BhPxD>$
+zZ~{8E^}0j0h{TG8IElSk(TF}#l4_MP!Z+11j!1%3_VFo?Mb(B{OdyDSUL(=3x~W2C
+zjqUS&d`}jVKzhP3W}`~KCoEnY_o3r+4XLJMyAG+}?7}G$rGBf9U@de>(FaDRVxt1V
+z2{ATKwY;oxo8#o>rvo&Yvm}&Q4JNjU<C&PVd`~ZmJNx>Qzp`Hp{+9LrwY>hbIy2e|
+zRF-TIG=PiMH=9O8o|zZyxBT7+z4;u*(QZC1NDv?dc9gw;d~;?duP{ir+^BUQg^d}D
+z5$n`|U7sRjGo>3nTfld_FwukU9)CqLFB=jPmBZvlXM$Z8P|AgyjC|^qFLt0JqWxG^
+zXbl^uCO&HeMS=u4Wbfi@#F86@{apv?CTpCOH!)ZFFFdcJ&CmlwaA#b{?W7XVP1B9)
+zoQg<Xg7)lGt0(xGktv_G0Q(0kVyc|(qMQkhX!Mhm0sr{a>&NILa<~aC=l)M7OxJxe
+z(LdJbp3BBtSigJm8z$AO&}q3r7cj&Hc)-cvaBLKvtaOu{T^M6GW-kmRm-1D#eVii=
+zK{qT8we*&<KkS2_9$=@<NT52{%1J^$6DC5quNtD-az<_ww)K6_5!4VkrhfsxkzqWq
+zc5S(kgansDeq?Lu%~sx`*AMAuOKffvKCHuze6&joeD5<sHUAy?yWXnSPkHbauC*6g
+zs>ftj&EsaD?9m<n!!a!e)F}^kTpLM?d2aWar=BA%(Ag1rsLKi-P^9dh4S9$@9Fw;u
+z&!FT+1u4Afxz64ptzm(>J!w75A?Hsej*^lR?fCpm-wQUeNA_-}rcJNwSS*HAf;0hE
+z8z6oZ*-niU+|L2c{vJF{gL!l_YVLnH<Vy+*5E)$=Qu_>Ef>VU~5n!{60t;?W*?V?<
+zP(~xX7fLtNIt@G8Eos$Zcal@YL#w2Jm9vjtS6#ygH1GeO)2OjPMUkSz>dL--=$AEb
+za2*kt`G6~{%N86z2hRA#v8Ki%w6EsK4Ayh<L7_!G)UMeM5@d@a+ShXV$=|OVR59`U
+zlJ#dbxgOA_69u)bY<>%>tBWriza-D=V-IMro!GVHEe7(XLr#)@FZO7|bp+O5Pqy0K
+zU8|(`au$+mgj_e$dsH@YR_XxTogNq_%FG`Bo}Zj`y1>hHWsbBTy1r0O2LW>|_xsZ9
+zI1{Mfk5KSMzB9{@QLvG6@0YXT)n?o_05`c@6y-d9quv%VV`463ulALHzsMn|xVWI2
+zjDGP<t*owM=@OeLbcv{1{1BQ;G4x9`z(YO}iqu&(U2mGGhN({*b-n=Qco6US6PtK>
+zLZ_J23q#94z~l&~{YKs+bhl7veK2bkTNmT`(Qdj+BlT^^ivj>{$F2-nVdS*lZAr!A
+z`3RAwz7tBSPAPwhU2x6``P^cR5&StdV{(#`M7yQA(4{$(YC-tKriVfEsmlW$Y_znG
+z=t^79Sn=kU>COb3G}QqZf_IYtBK$hZgzSKBwD63Xfe#XfsE;7#??D&3?MVz;J(oKk
+zE|kA^5JtyZpm)sJ`fTW|A+HX@AxebM&ZQ0G1qu<fX_ZYe-@tM^^3^p{*dSL*g0MRs
+zx`Xu~QmJxsM?(_V&4%?NFe`VtDEZRudt#pgpD8&S;_G#kPGaN5Q&jamRR0)kn-p{X
+zVlp{zfNj0El3omB3B5^<?l%7XRkVAyR@xt<3yi0gi%IqD)~)_FYDg)s1m~Qv&NNKQ
+z<U<2I0K@zTncvjlD;H=?cqXa*cB~y9D`pb1hAo~uk_`PQcEKja8|pEhh)=$iYrntl
+zSn^T>wq!r%R!)@tQSk%{rBaP+2+*z(Xo62YbFQTezXsH}PC1$y&?Mt&uB-LyR=<m_
+z^si3ZMH$@NYczigNeX=}(YD2k#SeV))@Hi?Jccl`68%Z5gA_lV$2_v65>fr3o_Hpi
+z;vb=<rjr*oDs?~p_0YeioF_MKfFMZ;<910PfBFPKxt3e9;FO{RTvA?7Dl^J-E3Rp4
+zeD>ze-~l?RZZFBau|A+p7_<|FkD1l_IB%+A@_kH&{5Jd4?*(>y3X+^UXA`c-m&0j*
+zF+Vafwsm1e4oT0F@MzjxqTu|r=Q!5ALpWYvRlel^nUUul%0e@N^F<VbP7xHWj4G?9
+zk>3>lvBk~_<lO%g5i=vG9PPhkVc|oXapAG~N$U0R9pGkJecOS9u3NmHNaKqYmmd!R
+z@hr2$D)kiO`_RwTdGM9jQk4Xzt%092FyZ~K*d^OK$25^HNYg<k#MJL^8FCs>f$wNQ
+z=SDN-od@dd8;XtRz=5ni=<^d<7xtjd!UiNZR0)>$$Zz}txumMZ*LfdQJOr(^;J8by
+z3Zy-lCC{Y<w`0j1C5dePTQ6KI)7Qd5MRVkC_cj{r<u{$1*j_>9jhpG*C>lbS-e<&G
+z-BzYCo4hdnVk&0CPg3qik@HV|J7?LVq1z@Dp&-S$Aou!whZ}Q#;XvQ+_b5vpOyauj
+zW5!4o9)TBTj>p=qk(1eNtjM-;CQ<9;F!-vr!bj52>G|NRr=jmhe#Zx^gWJl$nhub5
+zQ%C{By=^`c-(IXOse%8Lo%C0~m&(w!Xjyg4tT+0N?}e@DJi`Q$+@v{Yq%$sMrl&vS
+zH<i{>pab*x{=seX@0$jT=Xd3;hw5(ZH%$&`yVWx|TCmlV3FkcNDlbVM{>P9=+||-8
+zllk$SiZ|Jyk~7wIUXC{P)dUj(Vv-U7mJ75G;4l~~f~^tR{A3c*Cw=)ro(lRIPZc{b
+zcw}kFEN@CfP+5Wi4m%ht^=L7H6eb&*GBH;zwNAo87W4TXaR|LsD%d2A3lwns*CZPS
+zw=#}r5s^f+bl-GF{Yq)%9*O9FC>O+R-Gm77q8UU&XkkxIm>H;@w_8a|6WE`iLUoto
+z#8NT^Pq6F?Y!bqS(`@H&NKRN>Oqg0OxX$~6o)V^QeI5N;)})@RLOTBnj9m1UligZ+
+z`!rv=R%V^#1vBB4ZRm1XGe_O;6D&g_s&dIXugSRB7EgOuN1H&wB31XWstVAREDDZ{
+ztiHoafJ;C{0<MuyG1zj&Mx{)ggQPJ(>4pPJE$mv=2il<qj&nsJ#x){Yk;@rtwjoS6
+zJNWqygdzmpcDgf$cxAeP{hH*PJ!3_Q{n=HMu0R<SSn<F}TymS~UJcgM1e@TP@DJsR
+z9M*i3$r4nz-`6k%GZ^3kUGv<COmI$^)0d_|@{LEX6v+?qM6U_%G_rqM&Lq;W9qyF7
+zrUlYf#o=LlOOa1G{L1)h%V`P3s(&ew=<dJcI`)O$5CiQKLC+St$P=FGQ4Mk!&XKs^
+zsU>-iyRMv}a>?AW05&P-!k1K`W1}EV$N3m4y0slhnBpYZLxmAXwBX6zrNzPVV^UCL
+zyPKa5dWc;@TZd_&ZQAnM?Q3dmCg6;TbJ~B*kw_1&Cw0<Xdh6CUv9^k3P<ty1c+NjP
+z!PAsZFF~w}uEJWqQ2}_T&Ugr?3mOAOHXgdc+9+U8mUZ~f(!#TPSv(}Z5Wd)a$|M^b
+z+gY0_SgZGz?4t`UKy3PgmYjSa5u%|x;%yAr!*GIJrQ><n*b=k(t?CO7B=S%3<T7{=
+zYy(Sgv1NQ7MdD@YgnSbp5W{t^dqOIf3oE%tV!TGEwQc#-i5Q{Z-~OpIPw=s#;#U^Q
+z)NM<-cwL}&cEk%iZK7GDGzsc8sBDUnC<FCMikzH$YED^I@Jl1n>TA%u(fO9h$jAXH
+z$$|cKa8Bp@KWID+v#7|(r%Klmd8%XrVDH2HR<Ue?-_lVZIRD6LGoJr6bp;nvma%s^
+zJ)Y*n$05oQ#(!9>IR_TMW(R3fgn+^{nKiCdAM&-%m5lRzz=Ofpe%9N4G>y&*rG2)7
+z2g~Ph=S+2%%&8V%kNKg?7*c4qu8sRpGRG&vu{|S~sM?tsonnvUeO$CC;7i3h9Ctss
+zd(QL`nb_Aidn+lHeCSD$)bU#t)nS1Lyl$wY7pa=~*2(fWB73<yIIbT}^rfZr$)Y`Q
+zldS8B7%{5is`;TpJSLjy4f@zb#+O00G)&2E@haEkKvk&}oH|Qz?<l;SdXT+&?F4(!
+zv<XH;+eTx{Ug62Jaub`H$);-J<sF6p5XmlZAoMa7QvDvzwPk7!p~8j0U071Zfc~Q3
+ztA@QgX&Y1%erh>0^J@YpCqj<CS+iPPG9rL;OHm{>Bx?VfxqLdkZno0$y#8Gm{qtL*
+zr=f?#dX;HSI3+W;26jIhHePy5y<suNZ`mdzsBc`+qVRGfHmqSz_RzV7d1oiFlb75s
+z5P|$OC$T=!-@`mbvS3Wg;#iZCH*>NJ@pEN0l*Q#XOujIngzxENy5D**Cu~)7yN{HH
+z$RwS&y&vN5+8-RHPnB|7Gyd^QHYwn-V67MHC5Cl<>p*BM72%uQu8|_=KNH;7w$~l2
+zb&hmkH&Oj|F(Fj}DoG<d+<fhJ;wr#3TTbc>F$+F46_NiTOTgN%i~jsBGJj7S*$^_4
+zehG@>4!6c{Wx0@l9(nD~^9PM-hMBXRCdq!Cf3v2I^d)Gc9l<;(`zDO97126EP?vpq
+z=eSe0l(tcnzM1idq)E&!XfHO%;M7z04Cj64;`AN#$#dB6B=*?hv_)yuoCebW%dE!r
+zJN=(^9`_qPDHvZZ8V97^k88~)i?EK<a5^9ms}g8D=Bl;Im#upost_DqL7Mm)WTFZ}
+zf3r`D{0v3~$-oUtNB6H){l770G2u2<5dKNHB3i7vGBvbW6|DEp$%g*>Ex=Dyt3QhK
+zs;P&^AS4>~fgC0n-S%}d=;AcOc$YHH7SoHZ);^U5Dz6Gc?g#0{Bb=KWdsI%`Y@NJz
+z#Ki7LKeBsD*yzTn3hA~k^dy(^lrog!ID|SAILhKOi?O*sRiAbjBugu@3g0Heo>~Ck
+zf|~tvz#IerZ?n&{b5VC;4svBYAWOm2I)NB8>dAWu`YHgOd3#$hr4v<dy0LTYxjKV`
+zy21CR<k3<}Zc}L2@;#X1j&A=FffTfy>PnQ3<qcDcf68<^pmQpAd3X!swzq9=`2~hg
+z79T_@#Z50j5BBu(81r2wVe2fI!u?eOz-wXOCzM9NS;E7*j8i#1LL|W-VN59F5YzX0
+zo}a>J&fBeVvh<iISs;gR4i;8cTVbE_Y6R!#HF4u(LwA|ymnt~$wID&<(tmn{{NJLY
+z1PdxIn_jFV6_mc};0C*#-iOX~&7>|&vNYG1)(En*C(kivoK1A#YlSZs+2hB5mT|_^
+zX&7Ip=py$)ezgMv5kgY>eUq<egBBpq__7HWx1XhMx1Ze-M9p6{W`@q4cQ+TXA?-rm
+zE_PjbvxpkciIJQf*P=s5#c^v$Pi0CNx?Z+@lTjP3iC1OPe<wmh>HW*%awp?V_a!I^
+z#4_Jjw?ja!xi~`Gf-}46>^}G55rN~zn(^gTG%65BuR2B&JrZ>NljS9@uD;AY$<LC8
+z>q~o^iP!K*b)w$s>p9eL>-EnT6IMoQq;gPA9D46E<@X~@3ywcgRu7|(<}Zw@an{*O
+zOSiR_>Uwdsc6Lgo#wLD*cO%t8n)A1f%$@8g9zNQKK;HY-J2EMy3q?PCAE7?rTuGa9
+z?;@!|*$cPvbhp#%w+93u=)SAV=!GnH?ndKtr>)_u9D`fx;gC#@?17_iX-%XIs<NnM
+zRf5>U0k;rln&y2@y;<UPi$&-a=rL^i;8UzJ4gX_CJzS*=`1)6A2yDJ>>YUOiVu?G#
+z(4#v3yKqB>w&m&eSrm;<gHMN6%B^P%kUXKE7L{=yUx5aH<9T_~w*G=zZy<h&MdKk@
+zx~^wjb5|IYvrTQHj#O1nrNlnF?Mc#{o0<qRT5U*^KPEUu;52y72^cgHE$T&|&Oog{
+z<(G@A$8q8I_bi8{Q3K(JLO!oMNRLr2S+H0wnvj6x-;FrDStzY_<ZYEDCX)?#pJp`A
+zeFgVbjm~iW)Js|Vo<DKH#pRGe@%v2JDr+?L8o8fFLgS9Z%apyz6hT4U<BP*vvQJVe
+zrgQU1AUkBPE-0CZRJQ+eFS0nB>n*;XRG{^{Z=cJ=R{NSrW}#5j-MBlaT)C;06H3E3
+z%&M7JEJ!@{MP1vC)O4JqGBm^eDvSYtjhBnYE8IYS0mt(tof(4BNMD^mjpR;lo-$9P
+z$dpsH$W*cLiV^?k=f+{-uEPOpS^16^D5`AX^ilTED;<aZDEOBCc5K!B>VV~jjl&pC
+zHc^cXL6#h?&R>|U=DGqpeO_r6-#HJ-rDYDzt2*%}aL)Wu=i*m4f^J$nK5Ae~e@BYD
+zRsxh9z%j0$@!rnBwBegTQB^V#gFzTRa+=Y*$Q4>#fpN0lI<+X%wJ*{J4W?;%^?r3{
+zs6Qe?;97sFxRDg@8cspmtFTn-;Oyz0Bb&xX-C0VZCjBCk=1pU7Y%+=ql=v_BY*0JJ
+zH281xy-5e{3ow3m(V5QnaSt2%`^Cfy-!W~>Ws1%z0F)!!*}A!}KEBK~xCCd-qi&$Z
+z_{^S%+fHO^HR!MpxK`umvJg3U;zrX&&tv^22*~0~37%0UI?JnpIr-JO3^=t}Mt^CU
+zm$T^*n5D(mVqem4+%_|<^wtj(osxn$c>~H=3Qlj}?G*-}#>dOUGntFSLI-3gdq~UX
+z|J0F^IUNPYD2ZTXpNvY|n^O2%WZsx>J6b&yKD(p~XaTJn+;?%E-H<XhG`9QG4CJp+
+z$<+WGZE7+C&*z>Kr}L^OA9^BN{AMLZk$q#=KlgqmGNC8>uH&2!Z3CBTjvL&|rn}k|
+z>^zWrd>XvZk5V3%b#$=>C<x6q&9-26rbbCT`3^l}Son`b0~Fs6cW};mco+j6N6WIJ
+z%(kJT{^u0)sfcU?{TK6dWVR*|8ooVb6RmbMy22iwOZsmPHoUfb^}YHJOk;C7W*dLE
+zU}Oy;GrXmviqBms0%|9*&-x_CG#Z6-E8}EZVF(tZ(l9P=nK_9Ohc00V2*&^A<v|RH
+zfAZbOqNeu%e_=RZvO4SZT%uKNZv@%Gffc4xe{ZS2s*vv5y6!YWY+R)MhW}J7U*)tk
+zBJjLS^=2I(6CKy$v&yoCikB(6EnNo+Xc)ezbsViiuC0CT-`F2swW@{3W%6XRwH<o{
+zyF`e-RZV0br?k?*kMWn}gMSt!Pi7cU$|~0HYu17!Fvs`y{)};&T)Ir&MrQrqWiAOb
+zkj|K-Pl5$JFT8at7}Wej%v~FyYbA<&Oni*DUFF1!(3LVA@+}3)h)&$N8b}--;n!LP
+zdG3Eqg74a6V932@MmHcnb<t6xo(C|?$kLYZUZ2{5c}S01)KLuDqj(;|b#L(po}KvA
+zmPlOm^yyR~C%>VMo|bG}UDMb4XrCBo*nM0aAvRG*8tcp?!cJbNF1Ct8Zstkynv&jf
+z%}*zU4)lj}F=yZ${;?7}BYktLHV41fmCMgY{p56da+D;m1yaGAF-tEV*C0NFO%}xX
+zzFQoO@<^g;t6)6sQI7ILF|Tm~fB5m%vE$b|u&e5)ee4kOzG62({rU;(`s04%IQxop
+zNj7waE~`bbiKeqRV(QM6md#V-^6BF0hqTPKGCo34{s^Iku=?Ao+|RL@mg`#EakPmY
+zz9jKX5_;q={5L~E(oNeRCp*;Wgo%8(^^R-<d1qrzw=8kV>UN3KVq@=n&2B5!W0JCy
+zlf>!jx{alkEf?1D+FiK9T}G|hW7+f1G__4M*M==KnV5fa$UT}6r;}$_bhAH0<S6j1
+z9=4H=NoruW>@{X03`cAPJWyL#s7>z4yy%E|jv(62#m<N5;Szy*#GzBEKU{FOmdtRl
+zX3KZTNewA$i&~{FsJMO|pQPLZIal2z)_T&w*rlLlXL8V(8Q9Hsqk3^H5X=zXN=xA3
+zKX8G~kKZuORzh_ubyW>8(sksXsKh(yxleFS+KG2`FE}r*)^RYNu|1$mso8{?a)ym3
+zPMzYJyTfj;fzh-96R$!w^a=hpW-p+HKf;VOu6=6G)Qy~k8&T-B8QQvu+qggy@1(MG
+zc5!~_HMt9zKQl3;BjI}{Enmi)>=TD9Ode&rX0}7b7H4*qC)m~RD0xH(aifrbMk#T5
+z{%DSTl<<Z-viBB+e5~fVbLV%9gRe4)dP!&!&kKzshQ>qN#WBej5dv0Ytrb-T-!>ox
+z04B8y4_Sgum7z1l>KiyAZ%yHZ9gKPv(#LCOYUtiv{*neVWl-70mQr%-D{WXKRpHxD
+z8ssnco?fZ$jkd=e7u*bRR13IBdnA@;tVu1rnkaGFN?#VXi}(4B^W9)k)FI`_6|>Ea
+z)9d)`%Er?il3r1qv~(tpsc_I}qfFNd9Omcf__)d;RV8?AEg*h*@oMnh*&R@~T+9e!
+zO>%FTTB+*>TkE-~rnq{p;UQ^8h;Nw)sw*lg{(yxS<o>9DWYPl4>YG2}v87$8S`0__
+zdZWUc`T>j%Tl|&hjfgjX2cxu@?_sM$wi7pr2v5VmZ~2j?M%L`u7M&Q=dakWE=3RJl
+zAWrb>SrII*;-f+YZkKyy`4Sij|17Y9#f@YN*YKz;sBi@&is-Qt90X#FGefy2#DKXO
+z654Wror;{8q{}7A#<Rq!1<1Fg(%iLH$KwBKAbRqkv59nt7ATKPA^AHrqGMY2>%x#Y
+zzztv@Kj(xT0utOn+`b_7Uxm9Yv8g;EtZmO8+u89p;d1JIrNe9kkiVvxgM9MjAIL|)
+z>87g7GpT{Nvcx#7a+5zMX6NVs1^k+sd2vF7VCVb#cgfXaum6_$LC>rIQIZGZ;H!j`
+zCPv_ggXiq6IIt4UJeC|6yYpq%pm(U--~Y2(Jm3C(UmBo)K7|nb_!Ku)dJR*}2`U6`
+zlaoiWDd8cojn^A+JY*^qUbf?R@M-|csCP@-86K?uM6m-*kk1{C<107NmQ&F!$qrln
+zvaz~kaP4Sn?1qOZeL~gtbr)7n5W^pwIA?W5gQKEv`h;E8E_C8!aF3Q^hYIIWFyYnW
+z_BE_hl4`g5q*0o1&pyaz%XCvhul8ZB)S(=g78JKATzc<JmN(V!v(o~&_8X^PLFJP4
+z)gyv%+BWnvjM3f3W~P!kT!F&dw-XrM?KNs0aQzBByZoP-!Bq!Fv$JCmO5<%eO=Qsw
+zJ1c3ri6rLMSO@=WK|ge#i=Gsef7{}~X~6j|x{b9qPk?G2gNR&y*9N_`5^fAITT2Qw
+zfWYVFQe|mMCKqas4h*)J>H<!|CU1ZOMIFZ4QqkEl$tut60v>KuL6GLuyjuEW#Yee6
+zZf8l*@Gl4)Lc;`Wt%WalH6!f^ei`(4x%%7JJShge)=!M!Hff^e>bv-4q=U~8k)Z~&
+zK`ktV<`-U+dq1vFI<M1L`9`jZ5JW({p&`)%_o>LL&D^3#yv$2Bwt(8D+hSj`YXnQ_
+zh-e`vB34E--vL->YYsa<^EzFK@yP+_iS`Fr?qv2P8{3pvAw~1z2(Qc9n|1AFjqS#Y
+zi93kmBTzlT2aWfBEnuHBx5jx;z|h1$!nN+9fu}+nuWn7)#!mBCN?G}|m4I1W-^q<c
+zMN$x4PkdRrW;$~dg%)cA<b(+dJ&RP?WY3M7jW-kJ_mL-~8QJG+F$Dm+&1NoVw2i^-
+z5!p@GZE|P37lAij_jwRWRp3oh>r*f?A1flJa{63K3+rE@ziPQ9mojW@GJXkd<8T8~
+z4~ufPWQ?GN7uL~FBS|VMwH~~*F7!5!rv?aKTPy~Fl8F#9&iBWqL5du>Z_Q7bH-*YN
+z`o$6^asepx%>(l1RyHp@5Dzj**xBxA>X_`=<WlQj9sLF{nA?cBBCni#rq&rWIO%+`
+zciD#1`uGMDD}~0-cRV_y8Z%w5ORk<$1I&7MHZP1)0F`V}@&xs}q%TEh=<IeN*z`6i
+z01%Af!u7$=Q03^YI=Ykkoh%5ufLXpFdQP$<(`2s5Aw}73rnaccjhXEjA&2jo&Weh&
+zsm=5KVk6^Ibev=z`FWl(OkS7k;g=6<=w$5oJ!5w8nVpV2Nyro2diBU8{bcy-YRTsd
+zPCa89haYK^5X>2LD~OJrG2HA*Oy*Dmk2w@Ygxi~Xu9%iO!>&6AB*U8p-7XijZr&X2
+z86x@!Ypcfp*-6ZXS^l97-chjxW{p13Y>hACH&m0(jrn;Zu1pJPQ_2XU0;bj7I*=tN
+z%v0+_hl#&~&36_%h25kPGe=NIWa)#@tpt4NFjCZtq5svB)B^JxHVQM1aU_|PVWHDQ
+zblnuJrL`gTN0NeN43t`ajr_5ONNcTaexJ+ToH3+(I%-Y-oHl_Gz7+wVlAKy#%x|W?
+z*F<<zvVTv&rd^Y~ef>7V_<97lt2k^zsL}DJod(mZU#phXf<1f-rHGLQ#5X!4`m0SV
+zu}wU$qUo7N3(<S-x8!&L8U0Z(XHl4|9f~Q1lc2;lj7JoChsRVWspTvx60=wr3p1lJ
+zJZ3I(Ig=JCW$r%{@cXkeY8m*4J>oYwM|fT8b3YI-l6y_UgCLw+9Aty)z4Q5D><`wt
+z`@;89h{3cU0+U#JtmtCsO0la?<S7uw&a=2(IQk`oz%%3^cyuLXt2(b_FT0vK`OR=m
+zff6W(lh@$Ll=$+;&JORxspzMnbT3j4npO_|UvQ8@=FH`4at^UXO8&k6=OEEvDh&`U
+zpa!Uczwb>SNBkx61I-$!CWRXfw#7^vdwcu8w?RYzIeEe*Wjts<r{W(7qL%=cp_f^T
+z|GC`x&*hUB@A}_Z)6oolcT0lsZ(QO21eU`FpPR~mIJ{d{AN2R4P%N19aGm$BXkqAo
+zut(@|stGc~urPXKR5%}l`yXL@i)`P5X8wCSo%;{cf>;4q?mx;#LqLCLWooYmo7fF{
+zFQ?1n!S%?Gq7}3mHz~?QK+)-@rYeI|*qt!<;$qYz!cocj0Tg=5sR=bU;f-(l2+z<H
+zBkFT1ei2X$);2QsZ$Ql7wr=Ds{Gmx5zvVg6%02f<UeRS%W)8)0(f$<#D^j}fCqe5l
+zN&TP+Xkgqtp0jRWg~ky9veaU5cX2;4XuvpS+@{3=fmqq?W&^_Lld$a5a2M&aSBfs0
+zkMGRNP{@ekHA@yPb+f!!h*HvSD`q$CE`X1LZtrbJzi8B?Rp0@dx#C+Z1K>(d>y#RM
+zRd*qNHJrW7;P&XtZVkl_G6i3x9cSA^g-;xPnW-|5(Ob{a9nOOlgV~q32tL6?Zr~Ee
+z3UPuUgc_`A*N~6AEN?Tu{-b7uC25Iziup^9nEQSF{nqDgcG;oVKj)Y4IzVl!z^D)k
+zg50B!5a~iA-=C)E0MrnrCPhvzOL9M`KuJL$zWD;eAI8-sR}KmD5lEK6)nve)TUToV
+zvHqn(cR7%hFmNP(I|24q9JccYy1Z|@vM;?D_k6ySinTQv8cvEmjCa38qrO{ScgQs3
+z%Is;`lPB04ib3NFjyO*&FWMHVuRHn;oD0pVo-<*A4=S>*cfZ}#ic)QE>tR{_Gj!Ik
+zEO6f(GW!5qF?tu?d*Ueqbms^~1s95C4D~Gtp74ZfTu6mSK9x}4#kn}YY!WWXR=;(m
+z8LT7n6P}@C;yO5`*c!U)5jUi<zU-q<PCj$*=rk}U6~|iVOjbQ>^4FQV*@T}q<r{AD
+zeH)dO&CHCIZ((d~M)Wf?!(#s1F-Zi4rW26wUk-sr7)M|Fm4#FsKLJ(3Z94mnvaiL?
+z2Xds_+yKcISnVzwzTU@F6?4tpEzn~QTyCOI5#KVigX-^m)E#f_;sL&c)&8cFiGnAc
+z!+4s^&U%C_rGGz@LQ1G;ludsO#eZFM2OA?6h++vP&5MWFLz>E6`zMGH5#xI2w~NNV
+zJiwBzy;`rGHsEC*4`%%YMiN)>Hi=t5oT5`w?1+8EuoH8b@y(e{p!(tt!fR6?G1F#d
+zd-l1_xejqiWMr+df76XQ2dR{mX-4B<{RNR+T?OGJjfKo}%}hj||GcE}SRpkwjHaxK
+zwAp6s%4JUjTb>xnCr0r6H9u?OZSSS}Z=i3KTodEx4Mga6wL$y+A_MY-lI^E$u`C!`
+zSsN6=-UY2}DKvTed|{3lL5B16uFLAfb{rYLp&L(0DZM?7zZ)-AMzm_b&v}xqb51Ks
+z<}W<)9YD8Ir=wb!1+=v}Q5o(&wn>qpT5ZVXn@6!-3;wP(NbNmu2BCo}1Ax~i?~6rF
+zH*%S@toKXLaW#kO!Sv{UAbCQW{t#}Gb>1#1D(u?~YFpGa{hLbBp<+YC-*4L9xbrYJ
+z(PZ@;gf`vfgSXjwX-~AgeG2ii6k@z$<Ly1rT<=L=#H5&1sr#JhyjTPD%DD*hblct2
+zKk@ffU0C6Gj<-JlZX#bH`<Ky8pR;G6AIvt9d>pyl{q7L7$A?HVKE8$r1LY?W(91Hg
+zX7Nfn4Ni?ikm+~Ss)Scfbhn=+&ukOklcLb?qPfOm*iu2>f!OejIVR%+H?EF{U_+w;
+znW#U|o)tDD8%pDUdS=R#^r~V@fJL^Y-#KwKEeuI6Z$a&zo(R|Co2{gS+z%ak3=@O+
+zFKMPDstEN)GwR<0!0Sy;HuAEs<RyNh$7^LSV)??yFI%$0%07u#b=)}mZ+f+096@o1
+zL)$;raO_Em;V%J<gN@4OfRZpaNHC}BW}mYMy(+sfKJhDTtXO-3<?X0jBd<Uv|8Trw
+zBKG#SE{K(ljY2u9p9t|FIVS=fh3)9mp(!&v4HsDh#0XKZ)9J8nk$dy2_pIZidCYg*
+zKH72pQwy1w*1i5Gb04LfcbpkD0>Qc-asLe~@zK->qIo?16I)tr1TY*`J#8vIm}vmu
+z8BE9vkp~pm!P#^)u>Ps7p=UcxV8E+=&Fyc<h?|(Pd-;z(mg*O-J{Nd$FaE*jNOjWz
+ze0~6vf2?KxDOe=t&7b=+ObY;voP@n6LhM+;{kbiNJ)l-aX$|;l^tTMDD{5CbXQBll
+zrI^IGe~X#}7bOM>e&C}w-J4@}hQC8z6UR1=4|T>7BbwE5w*B`^u#Me>6?MOCw%?dr
+zuK_^gy7Pm-3sTB+t^FsO-G4Ae1qd2}r<?rb{uXvT@)^34TZ7&p%|(0sRqwO}>_nJd
+zzI)>CneOYGw*hF@2`|&%sj^3oXI~FmzJqF*W3o622^EM?+q>{L<RrX^0O!f~h)rBx
+z`|z%sR^L8(>y0cN#xc@<-jJ(k6FJcPpE>o^<CRDQHCP2mWO)+r8w76QDOLdvr%||h
+zlz$(wNuxJH;>uw9<n`uW-DeK`Je{`5XV90pIMFY5?9xs9AYLVqtm3d8iFMliKhT&R
+z(!7)Kpu4bIj^hBs2BvZQ2wIW$K#@mUZ0o8cLWLy#n`8tjkF*7k_(M0D${YzAwaA3V
+z+Y57ZDq`OA69aiYw|i6xKiK2fgG{D3MymVNSOknyaLW5PA+klGU!ohXm5gV>E%{-x
+z59PK>QjM;qm@7S_TeX`|3{57QrUX}>&!Aq-<c|5_x;5?;3weKEtwgm_`!5!9Ltl)_
+zFJvYnRY>7WwqBoF9kVtn$+*H9PJ@WgAH{nSTzO1?L<Ei_`*=)_jWo#iEHYHj-3P5-
+z7^gm%UJ+ydsE?E6$%O9x`*wx&{(s)CJbFdjU^PR5{^e8aOwQ}%G+c@Hb@_q}D&5AJ
+zAPF;-u4i8D)33E8monOMLGZdndu>0dA4+#t_s#wj@Aeu1MnB#Fc{?<XO(4nZhJ{jM
+z=b}$|=sX$t3uVcxhO#ocW*r;>rvZL~QqDBx6}WC7boOV*LRP^se8YBfa_Frbf^sE|
+z8ot+D=0r;w=*#>)q?9k@n5lRk7w!6!sn+?HpC`PqOj${b!qFH{RzHCoRnNHKki~z#
+zYyi6LiaN)65m?VXI6a*ZYAg`K!aMC?-P%4o{C2EUxoPn<BKHI{a(wv&b1+k8Z$QiB
+z>YI2XP`xPF@80P-Ha0gA9BoecqlQuiH3mvky9U~$O~zSkKex>^K3D-JPJ)!eEkw=~
+z3cXT&SsADLMn->lXjAu!!7930P({yD{ckbO{WOZ>vvf|C00-1+oF~bC)$wwiq-AEo
+z`|z6O{(F++$aeOK_INVYz=Md<#bCRLHrK943nU8-0hmo0^pW%5IkR_hZlnp-cb6QD
+zyxCVB`#ny_-Ys_*C3Y+1y+^ug7nom8-G`&Hn&H~tM7=GSbgvf2xoez0#*y-ez9K;8
+zlMu6)Ub)@A^m%$BJCVbd`j8@yr1sW2bI7YNrhcW{=Kj^RQvPqabG^Qc;cGDAB^CaN
+zKkhavV9WWgKp<l14_q$7?*BfJ9%;ChC8hpY?uowlZ#7ZRmd{50zQ`Z;2i=?(v`E>D
+zN1qyScuOvS2*eP>&FX3?N_KZ%Hy()f&XS$uUxv9GY1Edqc<%djn5@bdn6ci1z;A+J
+z_u8dPPZ+iF1DSSDygt>s4?M*vYV7@q<qnC6d&+c9_#2yy?XWjR>r#b8#BZKof~MLj
+z`aNafBZ8UqJNqO_-8>L<Y4adwkMvFTA0&>pCLJ<svW%_P332Lt$`kBM;LS2oeCIJ5
+z88EM5j}wjZyzpfl{Z@LSk-5EA<$B(Bmzn0-*)A~->U&62yswWj=Dc~n%l(V>olA37
+z+p%GlrnjgYrULNj!-x&XhWc!EYzjGxF^nHgyAD{VjIfi|8&{jqIG0b*$ZkI5MuqNP
+zckKS=!_n%hzk=)B&3Lh^u^s0Y-Abx(86DVjoyL@xEKU6rr9^N}dlPP2prYf@a4om~
+zVX;pBwRkmWhUj4SB>A#WiO0?HMD!~;g_Ns<Sv47!?=6KCJ_eT*GGC$nhu&-rts&+)
+z8}vFP#s_t&^{o-ojs1o)0RF{Gzel!~OLj6vxGU)@_^p~O(ev00IQHr?nq@Rql<ZVA
+zKyh^BcaNiF1D5Ws3DBzd=vJcJ-=a*ixlym{#o@_6mrU0_T(lf{*m50}H+H$GYuv<t
+z$kM~d@e7dM-t{BqRLNWzxDot}y^VO$UtyRZTN>;rvzJOD5H^&oJLWRjBEI14&r|0{
+zD`)+6O14zBvhuxjs~HIPsrN?k4<y6XG-FP!46gl{1iH7VY?N8R9r}gul7ZPEx!yF^
+zBKHT(y|Z}%!V_`D$E=@jvT=FaU}>2*B5lJ>qXtODUmlFL-Jv(%h<1+o*0V;$BsMy%
+zXU;oMYck;w-~cr*(333Wz373?MT)~iSIqdHK?Dv@Hgo!8%Dryhec^qbD|HVyMIk~@
+zC~PD1d&<1$6OBAb1nsbo8Z({A#^fcUHdElD5G=U_kW|*boc|8I<?|;bt9(f{J<C&b
+zEcAE?U>O*CW0&)-+zfJ5ag<edEVPoJC*D(_wuZM6*uuc9cJa`gZ6^J?R(oAegV=oP
+z+#5JIkRr&*{#kx*z-@p2iZ`e5C1BAzu1GkzFl;gP{WcNb4%ZP`cVGJ>?wvaED`NxV
+z5d@<z<O36F!2CkxFdoOh-vW4x;!oNxMmdoF{a4=4Ka$*UWpzV-2DY3t`u;FaRop)v
+z9o*b2-tnxt8<Ev)^NJ^IgXtzhl?cI|NAGoaXJRGDJy{0MKv~w_#@RnUfKxX9M{kU;
+zfb(psY<!qbXp1*1&3w!H?PvE)ne;vbJHFT|cEYOUd#hD5J26QiR)X_Wsk_k+Ue|hy
+zwNE^rrcg<me4)ZpU96m6ek8<KAy!Zc)w8r|v`lUeP0_zJGc2^Owzjv?)u`ziDo+-k
+zrt4ZAc(29C+`Vj>Mh%2r5)VEyVbIV!H}jhvjvz(t7khMi7tQyJHApr8>=%pw=Kf55
+zb=5I!jOK0ZLrIi_%3jp{^Bi)TSC~sj+wcj#rc)p*zg(z)Y0RUuTd*%JD?Q~ENORR*
+zP84stXGCrAjj2sQ_)oA&eVDH-zeD&bufUF4>0w|@RUd3-c<;AK-ehWd_x%2R{>Qr3
+z8$ssMAf4!ze4DLHmM?;!fp1N}GHJ6cepGNJ(OL!U=C&^g1vn@^q{B1~P_7cI!3O>~
+zcXZXXUC6|rZUHi*1EcLTG6J0Qb@RIx-fQ%MEk~62yRVmwFa4bN-i|uEwm?xOE7w1r
+z24;@0HTqj#L)0X${G7rAEzXB~i4jbyAl}{R)o_E&obf!e8c<2O)T?Ux+MzD#WXnFd
+z@slb$k3=Nd#5rxCn$WDdcb$tVr4(xE#rD;fX|v4!D}!;|)8Yex>xGFngJg*F&Tjqb
+z6_3}JK5G1@4Bmic_>*Veydx>rM!=CL{hh<0FNGq66X%swzD`WN5ESpE(&m*oEvqRi
+za6-;i&hB@-Ly(d`=Jnm6o|JZx=oE(CgAnTLjBhPI1hZwc7qw@bN-S+IEd6waHsM<|
+zJ}eWlH{-2)$rqFtl80Jr51%p!=AvJ5F8z?2nGuyrUD;yaAR~pBc13`V9E108-7b58
+zY-7?rZ@>Gf>0@*@B3r<F(Z#E0NdY8U5}rn*@qgO*?yx4hru|Lmy-5$CNRcK*r6VYy
+zbQF*xC{2m<ASGZZp@Vc#0jUatNE7MOLXlpiLqG^b1%%LrAnjY8_woH**YErG&)sw8
+z%-l0`pP6g-EC&1Sj{`>wW@gbI#XOkKF#ZR+*I&RUza!yZKJG4!IDwh-;NCqo8;G>v
+z4Kn;zeeR@cWF{@i_ESb^r5NyR+ug?7RGR<SFa1sQZPb9Idt~%#$c%Bs*nnqeIhu_3
+z9E6<cNOv^S)^q29qfT3gpwv(vKhA6wCk){e&Z%S_v|b+2hjTF(^_=RfP|kYN)U<uC
+zFZw}nan;3;c`k$xOn3F((q$e*(LCI`l+aS5LpauLFdgmn{LhywnWUSwC3YGnVu-C<
+z#Py$R2K|53RWd)3%ZB5=r~Z&Y92xnF$Mo1(GB?*TpSU+6{T@4eU&*XvEO=Bg*{nj9
+zDjvR3Lfd7ro!}n9^7An=2+fdzBi3(fU{Z8ms5DT;2dH@a*%X+{wnmq?zDV>hkiFL4
+zQ{H-Pu~uFCdaNU;$Ev~X%J*}Ts-Dd$<Nb-pJee#<(Fp&g@Da%x%=>Gb2>WNJT9rsl
+zk27xMwaxy~%m>3Z;!6Z}dzYR{AULuXb0KDdkL_}+?&O3(W+kbCCFw@Khsy-O;2xnq
+z7v2)K#{6!-ruBU-?(^e2shvhU6Qr|^Q2MOWloJ>8G0MnhXlhfcV#J22J=Dz-nr9tS
+z|7s&|_~lOle{Wv@#h1HgB-zuz?Pj3m{-U89lP#L!6W!v#m0{U*Gc?QfKPVK-tBe{w
+z>(q-C^pYVx-xk(*r9Mz%uRFuFX_TAk3a+*7%wWTIwwJcvH(`QDbr;rTILxR+vC4@B
+z)0j-5w1*4{6YYyUgtPZ;iUbde>&EmfqPA9Kw2nJKDqG6uFvNWcy=hvS+FHJ@4dqeC
+z4GSRUS$o)=R1I@4w()?AdDDuge~Qvr?xyQ)vd|g3G5!DhHKWU)d*?76qVf&Y1_Zhv
+zuDn*&*C3KEAuHoj)m*YZCQ{}^mHHnX95WO`yOCFlZJuP@ek4rWI0=kSw!ZM*Je_IS
+z+5GSUb&B6`XNJl!2%YCwzpK$<u{zbN*q4az{atf!_0F*)1!4SfbZ*J4xMttXb=7=n
+zPtn$0f_~hzyn3R@+f;~^RP!zq?OVq4v{VZ4Z>scf!vxk+)|w{g4*eevr4%MOm+m~U
+zE_xKOuZSvFX-KmZ>W#^J)D`%;$L9$=H0&ObNq^)vstSKH94~6B5ME256PI+^kQ}J4
+z8%dCfjKVf>x=fNid)Yejvn~Bl^Go#kLMd#+{RQuafL@wY16?_^u1)rrs{PBM1i5Aj
+zH;;=Yz16CL#XDY)GO5v}@vHYB>YrHy?@Bs`{mE4#r4j}12R47ACHD!3y!=>Iv6-^5
+z4C{HApBEcIokA!ZB&S;X@?POYOTi4%q#kVseTunV-)3mqtY)#Xs4}X0IgWlVW^41E
+zd`WMsXjXByZ*j)LKrBzw?2AavRch6d3%|WqrlwCN!gtt~oSZQp$V(Mq6PYi8lxe*w
+zGT$x&0I}TN{naI4%M1N+;A;M+O$;EPvclDWT?AY3Zg!P{EjDZq<pL`JbPl}fWC0se
+zDEm4Ww;SYZ!XZKc=Pw7|(X-HrR}JTs`pyG5k6k`%pSxo-((K+`hqJmtfW#%C^Pvo(
+zpg7;*ZgMv&r6)u(wU+^;dNe9!;84du?gi${?kLI@06<vrXj_2-jqI)1HK(3{8*@f5
+zep<^eCMxPhym0!X%D0p-eF$KKC1Xrl)ZEuC3iz?m$f+q{_1KE#!SZ`r+zlJIM_ZZ#
+zDbK=pB9h<!esb{4fa!GZ5nF-=t8yC;&}VPOYT?h+lRuZuw)m=Ci%lEdSKqOHmn^}j
+zwp0}fiQ&&u*O2)#Nslh~)5LCG7?@@GK|0I^IB+9|XPYkZPmj%y-c-(w$??;?|M*C8
+zEi~x<b9`WiC7M;b{~|x9)Q5%~zhbdB<vtJr&R3Per_Y}yFVmn!E#vTVNkbR;(?3=g
+zLIE2Sh9J)vm&LjWkqO4%SGSZsj0f+j1&Dh_YdPI})f(k`G_X-gWSo8?_;}0eYL_vv
+zTl<n@vP&j4Du1F(CAST~LqzRu%hh(@GL!DHtG9{Y=#P6^rqKZKkHow0?kJs3stidA
+zx<5AQI;jzAhUVss+s|^$`12<#Hq)S0P%DnWR(G9ZS#eO*;n;vq8PxQPVqsMNP4>|8
+z-QOAN>8)nfH0J|LfU-ExHeVX_+@8p?mm1Ub$ii`o2bZ;L^#*Oe0B6hdonL(ZjmUNn
+z!H-w>{4@oI4Y<B5g@)iiyn#chnM6eRjM+}(wzt@U@d?0+_pp&a*}O?C*THh$;@s|~
+z$R3ga_yxhAGEOeuvnhZ4c7E2(Qi|`&)J6#mzHnO3&MjUyrZ^l_)9FTe;gQ#c_KbnF
+zYYW8s)Ot;UyS;RmIesa{3<NZ(!oD9wXozsC{xEmmm9EHv0=dtXf+rgXB>AHeH@#&H
+zaSeztP+ijgx9RhTuV<|xHm};{hh~oW7qcL$yg!v<CiLHjsCdcbYOE?3m=8{VKcNQD
+zq9|(ojdF#kD7pD*dY_FIa1`fe@!jUiMB0qbN2pFXG>`^BD=(2eY(8aV3i@*o^W$Ow
+ze7N}{Ip#%}a`vV4PrUe>^V&p7fE?Rk-dM;N9Tn8VK{fuexpL~WGcw{jD=13O<LI^a
+zUiQY-BX)pHmE!t#R#;RAp8FWrAmTUXcE^nPu9-UVqdZ#*o_gL<%?L~cOS+>DBo{w(
+z(=VMml-|PZah1F$r9Vn(-a<==gI)RymwzEd8%*a9bv$_1dB-R%uU^{qIkFnv)`=ip
+zxwznA6@T~zk$vXs6W&8-5d|`|1#g!hdME37lm`B}WGmA#XoIv$-@=?qZq7q?aUMLv
+z3T<IGQTP2E0FV&;VEcaz)HT}nk1zBnZIzqbquTON>~rkrjq)4PU55S`EXE|?1Ay-b
+zEf~eK#eJJq7|UjQkZcQ6EeuDt$oE>qDzu9aNLY`ikjxT-<p77vhP~A<B|0XmuAWd_
+z%>!zR)kj~#M15@}r*0`hnEMUWY+?e0hmE$+JW@tla0srhxHNkK(RKN&pl<Q$EtU_s
+zqGKEMI#uFcQyY08UMYG)pc0UBCO4pvB^qdIJU6o-mx~W^_UWB?8Kir-A6(c%dy$1G
+zb5T3Yp;x|d$?ue)?EnF!zB-VYoe6(_rHWg*NjS5qX+v*Ox<<HPp3z_|srA#lzM_is
+z=9DM8PeHE>U52m`!NDO4Z>SwMXejo!va}nYnPK?$(A+-3>z^gnsOR2hpYCR9ppqW|
+zYc{J0fA%c8^T|)FvE;mSbOi+J0A1qjk!M7kWhACYMB%47KOT`eP*gLA<R@tRK!A@~
+zDs;2!AS}~HLr;l4Qoi=89C8?>Y|qC4xjIidV&B}yN&|Xv{Z0wJ8sUJ#ifb!%s_^<%
+zbrw%_TkZ2w0!5Vzjf{|fMO*)cBEt10Q`8|r;t%R&yW>o&rn>DN>V)5Mx^u0k{?OD$
+zx=}ON$B4v$!CcfE+xXSB6XzF)wLP)NOi~frrhE@&hP7@(fXyT&h&@+gwx&|QxhOEU
+zUKx<r^z2;rs;YP5!z4>uilZT!I)b|IBhIToXE@FY-1$n?&Q%D_mG6AyL@<2wlR0S@
+z3?J`xLp4_?HiFdIal?j4ACk^JwEZEw!47w^1i`?v8B#FbdhESvrBZUZ29ah3RuTwx
+z2|YeHm+LhI9*|*VYIzhMwpS3?0<^8F+W$FvCtby`2F+_|Pg~!tZbm$@em`+TF3GXK
+zo#yxE*weHM=AY%k;m&XBLzS*3#Tr8x$GTorC|#?$8sfsAR0gud;5g0~5wj<78EboX
+zJaNyU%8Uax%k8rPnL&mJ{s?Es?utszc2BlIBamVQC1T235r&PjP{Y@`Z#Yetasx@O
+ze#eaprOn^D#Btr#NjQocU1zTp%jHCnWO~dJy~}!LG8+u;Hu0+CU*P6~_saJpM#)?2
+zPQo=Ge!8%P%K=kOvCfsL#NE#@m>TVC&n<Vyc|JiLWcf<KeDSlr9>pzpC*8%jJPv1v
+z_axs2?DHZH5b_1q+<3t&bJi5>Eo4YZ5oK@SJrE_gmtpczlEuX}Y+8dqiwwXp*UEL$
+zs4ZN`|F4Z`0-Qc%^|r$fnes?Y%jHlOcw4W73DCjbz$A~>mKAH$<4-vXMPp^A9Bhup
+zK&H{Y>xO98s(aiu^5Dq*gwgcc;b2=rUNNpd)F$kq-Z{RmpnUJG$gAuiJsb!o5=UQY
+zES~8H2N{XD)AbH9sGPR_ObIy*pDj~a7(UJ|&z_BH$2WFfYff2?^<oDc{9Y??ny)Ld
+zGUXVQMbPMcC!k9G%6JXZji;&u){Ny(CFVH~Dm@v}YLE*(4AK46v7_}J_mxIOu8lkZ
+zz}$)vX_V5+7oaN(%kbIF3Rm@<R3oen7*000F<Jc%Zprjlva^(Te!n3u)9=AnUDJ)^
+z%6fSM?!F&Y(0F=~qlk!}JImQ|Ej^l+RlM=(WH~NVpEg2jakVk{ArX;4#SfdW?Wn$$
+z>eZkEgqb4Nj<CyZ4CwmiQO4-eZa0Ke^@jKn@jVlL7KE>AtL+{|rV7Kl{y@FU!iNuG
+ze6;&nnm-#2kS7C3X4@VE$Q@U@@9Cr^yIIe*tO{H#U(f#z9HYG5ABLQ$R=vE0vz|v6
+z@qI}#8_ATPLXxK&8FHp5^iB{B1jMI7Mvs`Xls6E<7OHD9=M}VU&@S%JJtOvdrLk;I
+zA_iNFJQr#Nhkw4*ut&8TJPS7FfOR^KO+n|Q!$d5>K-k-Z<DP=nYLr@&txfhJ*|whL
+zLFfa$SItf&e!w!N*~`RQxk(acx5pig#PM)Pzc236pUeQjrR$XB1mx$WON2&!(^F{e
+zx_jS3;>yST3i})+rhaFk@gO`T*JRDePScK*w=lZTUzjP}<>W-FFJ;LRb925ZO5?E&
+z70=$bwXV%kNnF>g&qy^NrY`-Rr=5-WyA4_+LVzey$XI+yDe2OqN&uK@eT7e>Jy&mW
+zDVhF3<zX!{rBgZc3g4hFi)@(h_{mfuqFYQ#^-8U0bt$SIoZf5B0P7+>>_Cd%?b$0&
+zydX=17e6!8*7d{C`I*n*t2o>WVl;BNBd7_ohvF=Fd?ei(!92YZg;CJ^w9=dsWmE(5
+zd8;fdo(-H9=ITMwLSq=}$k%?o9J4z<JXrae^W?`h;+(R1MvwkO;>S2o=6s&`)uQT|
+zfI_C~H8AR(<=OFqXLB7-J`W_c421mP##t|6S{fl@c8yP)JebxF_!|>jjWr%7)J65?
+zE=^+&z-84P&jCsn7g@)k8;1s(0^-g)n~x&cN+PcZe|s2#Qg-cWX<}>MrnVyb`1p`K
+zrRP1KLb4ToVzierF6lw?dt8bG=?nYo5}v~*e8WVeZTk-ST<F2NB8Musll3a`VxVo0
+z0`Uh*>X${@>)_DPY-<Q#YKIZq^OxV#wc;Khl_d_nGypffskshms_xC&LL;5^({rYU
+zyH4KT^p^wKeFCU>55|zP8J4q@!Yz=lL9_y0bLC2%694C5nNV4re0<Md#D>PA$$c=i
+z==W$li<awbdeDZlm~x}N&V~Zz+0Uf6ngCT4!-O#Ldc<wj;BVGwk;;Xv>gGz3!A9~r
+zT{1OBdihZ8y)aOUX-GNK^pm89bNEHmKJ+Ws8=a)CF^8V6)q)k@mS#oVHty2z>_-q-
+z0&#s<*z7}!mOsFpwc#eSa(A7SeYJGiCt8Df-a$U{iwzX9_~9@!+(K!<Dc{c=SCgCs
+z#TvYw(DcyFs27UwECG4A_|Nz_Nd~9k+LuA=dKuIJE5KC6H%5~U%jj<pzU~&n&DI_l
+zL!-o&kzWE3_3B%{JJs39`_~&{e5D&4E*xFz?i<!^0;Enb8qMJr+Uu05U}LlSVYN+-
+zmyCX<<N+Bv$0x@Vo_h?=^EBZ;mhMyXwPl^XM`65b^T2uLNJIi?mUo!UMvT}H*BO^{
+z67$mePD$efIA6E_@$7Sg*eI*B$1j?TO{3a$8UVnz>-U>vcyL7q)&w9r?kgZ~VGX${
+z<p`87vrim`+|Y-qtsALq>+9}j<kaXPu%O11w{3;ux*;b%cD(OHjUCuM{#dWD0iH!T
+z#!gFZRn`KK_}*|Eus`gOX1oK*g`OWLMD9kQZnx)htW!PdWiQ)3{oMF*v*mdDE#LlI
+zLOnoyJI5;ZhFZv^-S*gahT|ltTY)%4hUl5$9^Kx8bB`~zCp@?vPa;34b7IB83gr0B
+z6Vy2kfdCW0*9p|O6AKm{Eeydy+*WmpbbYU3{VwQKvsRYhn|c9nBoNtO;<uQ@Iu!b7
+z_tvN)8PK7BTAQ0}58WW1l*>s83vUlLJJ}77j3HlNJ%dHc^f+iH>i>EV>csFZSpFm;
+zZ^?lm3M~GE%M67nCVE_|Le;;T!G!dPyG7A#sx8R*!NP~Y6Kq?XDpG&J$+Or5s8Vo4
+zm`&9(tc|ev{G!i$cJ2geGl^?SWG@M)SjEjL`qp1>oK;j7>K%$?M@b;AR__fxN!I3L
+z1tbEN=`RkoW0t%>gS#{~VDJGHq%IphB!>~zu_!go!G}1rjo$+wKXCqfO^qbfJ{x_A
+z0$Y76BYVHsm9Y08j*beEWM0zCrt~u}Sb6iTCP;U<aZLhq)=VIV(M|OBuxooJVbl5X
+z)aVI+Ts)K)`WXru2ZC6OopEQtTKCuGcaCK8#ITMpDe<95{DiJd^Ttc1nCRe)+o`0+
+zc-x6WxpIy%QTb-{_(u{arDv$|tU+LKfa>~t6AcY44t=T~_YJR<ly3z2nr-VNyr~Y-
+zR+QFV*k*te0olx=EyD^}UKw)(0>6WmCll3L*BCagIYmp66}UlL=`0m^R**7HQ+K@^
+z!?HGyYLS5V>8f)8_JgzkVPU<<Qr4K~we!QN(RQ?zVrZIxv;SL3$X_m)@JcczWd*))
+zIka@hbF1*2=T9c3$18(*=`WltD+(yuz5hm=89PYD$h0Lwk!cY3U{xvUDyZe%cEUc#
+zJoKMJKA-d&MA*o=_Rv6})CBPAl*%C2gVy+f&0<toA(K6IwNK85#)ux78l0~7HUdUc
+zGWW}ziD{+entbP#VczX5Eo>1$*-nXykfA4e1#+&2K>IHbn0D#$HzdCWm<i(Q1lC@8
+zX7gWQC6Yw@fu#9Hsmg{@Qpp_%V}Y$K4_*zY5AJ4BkGf%^@@TG%6{RHcyAZ~jg_=Ye
+zdh+aTuz}JdSJuu}=YWHZF5qkeXxOHe+DP0cK^~kfRt-ab?UvU2^lZN9QPP3I`O(ZP
+zb3Y0>*mtILs-0b}&^7UaWu-L&HHVp&1VSwZLDB&X9mm1=FVy=x^mVb(R?jWqR}y8x
+zBCq`>k~-cpScerLRQ>PK8$0?OaH-(}pQjGf)B$9SkxV|qe({j1vyVY*SidXi!~`jW
+z<=*4lsN|>g<a1|@pB7X?psQ8yQ(=Ixktq1gF>T;oEQv?s@);7Oe%UYzsp(xx?^y7W
+zYuI>2R5@UF<`4mh+q)$7bQiuugZ!~&A+?-2@A*y-n)r3g-4!9VYT+W4CqdHqWG-D#
+zA92&I9BT&u1g?hClq*^kMZl)(o0$}41{_C)MFTbP|Bdy?IR)^(LRhh^*vnbD<$yo8
+zZRHa?Rh;x0{vEixT+_NSEkU9{vJLy;izHa62UFsHR(zBeDJ)(rt;e?@Z7%aQ@Q3=m
+z<D3WHL+{HlveGAjEY~N8aN{tBGj+`Tb)|g;_Vh>;HveYgWUS{2Gd}?k7|=p-;QKJ#
+z&BkElw<<q{<$h81GXVsKwNM#C^rT+MlBoPte65$gwaR>s9w>cf?rDm&+ZSn@nCqbQ
+zy*g~@9{ZKcMHN@!U3RWzyj{~{Qz|@vsyc2e0oroCytyG2@+beq7LbkMDE^{)U;^Z~
+zQWo2v>w+#p;+jXn%nGT1biM1xX$ei)&98J%tcanjEO4ERM0Z%jiWpGcHNjielIEcu
+z_fA2Hc~u`a|F+YCJkx?%O$l(U%xk(Kw?|Qyx5Ka;73DQy^7&H^+v)Bwz1r)hmH4-@
+zO6VII*ea6Ty-WX3&#%&bQU>slV?mrtvJ@7gRrz2|`srHS797M`OS_)0%kBQrsJ;?l
+zAw86Z_P7}DTDz=^9nbdxMkfEO$PBk}<Q9q0Q~(5?NIFWdW*S?A5`ml9d;qHw0Z*9J
+zOC6u_#T*_ir2DPkx-U-7-^X2Tq)e!qB(Zrf_xMY!u9Nt{^wWNS7~IJIl#=6~5eS#X
+zRqT2mO`eFdNa7CY*L<TZ@nXwgvhN>NYJ(5uCJAvKVjqXVHn6c*@4kVPWZA#EKpgD+
+zQ@3PQYy`9~5P(PDI5Jwf=sP@^K29JN`IDc31lFOrH@cV;fQ4KV-1)XA9~g`mIG=8o
+zuHC0i`11Q7RCGKIC}wYSo({^RRB?rZKTLoZpyGF6lM5U(PAy=l)(RHISk$oLeV4o%
+zpW~IC*6PtY$+2I}fOk)-R5W=|cYW)>>ddc1MX~Ej4cd_(I&VqpgX?*hHw3@%;Otyc
+zQ^@53rAQQ+Ra(?@B?wPE!|8n9q>2A@4RTS3ya-4PIdHq`ce&jo<ZLk!zZeT*#V6%L
+zye&-i(OU^x4s97dGPH|ZnG&q4JXob>*%)%?^WVU>$Q+eUkr}kl%w9?zTHytzXE_d)
+z?58N?>Arr$@UPS`c8Tc0ttC!Il6`=DS5GU!O&*+)O`;E=Q}=KFiE(=dLXTeaTJ^oD
+zxsEH$?|2U+mSzy1-5J~ujzKqD?iK^xfvB%1cAbLPOg}GK#d%!ZJXM%5CCjwXc|i?O
+zxn-|vURnD32`nxWkN<UWiPxZoIdR9T)z^{<aZAKQ6v+3@VTZCqk3n$N{wwU~SeqnI
+z0aQ)VtzcDGa4C5yQtedY&pqH#;a}b8Jh^h9lOy4)@@-yesa{dkz)E9y8Mkv<2woMP
+zC07mVX7E?sr==1Sw>Qbf)tkC-5Y$b1vrbs&UEdwt4N*X5?BDQx*{{HktK-Ex#8-Es
+znKZHQplWZWyLfKK?*vCzDZAe!Q~UEbTavF9Zk>xSR)~m{rs2{SU}OcDODAVj5t%U_
+z<X?F}Ydimj^QosSgkhmB*<;TLV;FNzpA6k$A5r`^q%wG8;k}!u)d<`5YWB&0w)1Vd
+zB_o*JXutm0)Cf9<c|{78TCPx*47(;jNJ^jgBPdkck~sFz>Obb6C=`;^etKP`SK$rG
+zd+zm`8rXu@%y4!Uakubt00Qm{#wd^f0Pg$Kis~pydGgBOLk13Q0TWT6qh-2`qLWJA
+zpxuMA^cb05MOHEP*R;18qmWaK2e-nyeMl)C#|;5yQ9!`rAyO$3pMkN!MClW>Eg5x7
+z|9as_f!%(V?kGOb^#;Z;TEl=0Es)~*xc?_5P9T@<cEUtg^>4rGNbJ85vkqn!2UAEF
+zY(otZ(LYEA#hJNTfn<N02Xdw!q<#iaCv>lVfVSnO%D)rFw-h`v#u$^&+d$-fb<DIz
+z;~mKPmF;A1HM4l(p>wh23zyuzK@h)I{oVFh<=|H~uS(I?<>a~gVK_A!jUl?4$za0_
+zEjarY;QY$9uHS`8TiovFm6-{&8h^Q~`nQJyP7}6o)T#n2gYOAunE+a{{ayhcdVrHG
+z8%fiBp46)FYZ8BRt2DuqOgUl;9^104shms(LWC-)f7;v;jPZ?)#$3+$lU(z$;N8C<
+zt?qbiK!YfF9Rw4kzr2P9-WOm6rSCQUx@8ZG1MO}mFIB#qSVbo1_#g3&=5&}V82pQ^
+zOOZ2{pmXz+sR0oQFhQLaDDhgb+cs-tFNED%_3!@^-UkUUNgQxQ?oRyJPDt7IyBA=R
+zj>vZXek4HwL;@5f)|zrGH3O$_zonZiz$(#8Xn4;~*g7`V2+XeUF+c0FOYrBnVIdW&
+z@yEf}En{`D&{Ambwci+BObo|RGM?;=i{Pw1%B%oC!J{lTl|!HNkc0v_B(X<$IR^M!
+zdKk_9gW*Ca7U*wvy}xO_i1=yC=EatjoCj6QH!uHu`8#L0Js<24IJ8-V?CQ<7Weq@c
+zA!!Nrmpi>+qbsdm^drSyn$O=r)da+cKDWNOLT+znL;F$eqtaI~51MC+)aY9{9+)Sh
+z|6QyChvxx>`!AP(q(NiId1k?-STl~B**qSxq&}oR9URg20+$6T*vQU8!M0x%wqYj@
+zumKy1a0sh7ZdH7Oty#;<1c)N;8crrWjR4xEe9jLs#_}L&$;qMjxPyApS6Kl+o9WJ+
+zcNk_Hrg+U4TNfTT8fI(4oPI+tKG*67=L&qgYBq@Y@T7qHHtScu+t#^~@y#3oJ)`V-
+zO5qn18z3`)3c|$5_xYPO8m5MYse&)!tLWd>=C~b<PA-)_U3|6L#rSc|eQM-X&|W3<
+qwn{v!$;VjbKHrFhYJJIMms1+Ald_9k*$OoPcxh`IXq4Tw3HcvceMNcz
+

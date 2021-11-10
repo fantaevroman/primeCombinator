@@ -10,7 +10,7 @@ import kotlin.Long
  * Between parser allows parsing values enclosed between 2 other values
  * Example:
  *  aim: we want to get character between brackets like: "[b]"
- *  how to reach:  Between(Character('['), Character('b'), Character(']')).parse(startParsing("[b]")).get())
+ *  how to reach:  Between(Character('['), Character('b'), Character(']')).parse("[b]").get())
  *  result: successfully parsed because "b" is located bettween "[" and "]"
  *
  * @License: Apache-2.0

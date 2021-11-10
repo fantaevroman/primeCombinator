@@ -11,7 +11,7 @@ import kotlin.Long
  * Example:
  *  aim: we want to parse string "   Name is" which consists of spaces and words
  *  how to reach:  SequenceOf(Beginning(), Spaces(), Word(), Spaces(), Word(), End())
- *  .parse(startParsing("   Name is")).get()
+ *  .parse("   Name is").get()
  *  result: successfully string.
  *
  *  We can reach each parser result as parsedSequenceOf.sequence.

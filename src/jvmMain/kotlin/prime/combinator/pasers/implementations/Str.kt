@@ -12,7 +12,7 @@ import kotlin.Long
  * Str allows parsing specified string
  * Example:
  *  aim: we want to parse string "Name" in the beginning of text "Name is ..."
- *  how to reach: Str("Name").parse(startParsing("Name is ...")).get()
+ *  how to reach: Str("Name").parse("Name is ...").get()
  *
  *  result: String "Name" is parsed.
  *

@@ -11,7 +11,7 @@ import kotlin.Long
  * Character parser allows parsing specified character
  * Example:
  *  aim: we want to peek only specified character "a"
- *  how to reach:  Character('a').parse(startParsing("a")).get()
+ *  how to reach:  Character('a').parse("a").get()
  *  result: successfully parsed because "a" because text contains "a"
  *
  * @License: Apache-2.0
