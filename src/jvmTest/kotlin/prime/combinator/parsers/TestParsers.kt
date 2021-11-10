@@ -63,8 +63,7 @@ class TestParsers {
 
     @Test
     fun testRepeatUntil() {
-        val repeatUntilParsed = RepeatUntil(Character('a'), Character('b'))
-            .parse("aaab").get()
+        val repeatUntilParsed = RepeatUntil(Character('a'), Character('b')).parse("aaab").get()
         assertEquals(0, repeatUntilParsed.indexStart)
         assertEquals(3, repeatUntilParsed.indexEnd)
         assertEquals(3, repeatUntilParsed.untilParsed.indexStart)
@@ -155,6 +154,13 @@ class TestParsers {
         assertEquals(0, endParsed.indexStart)
         assertEquals(0, endParsed.indexEnd)
     }
+
+    @Test
+    fun testDoubleStr() {
+        val strParsed = Str("One,").parse("One, two, here we go ").get()
+        assertEquals("One,", strParsed.str)
+    }
+
 
     @Test
     fun testDoubleQuote() {
