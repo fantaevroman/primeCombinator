@@ -29,23 +29,23 @@ class RepeatableBetween<L : Parsed, M : Parsed, R : Parsed>(
 ) : Parser<RepeatableBetween<L, M, R>.RepeatableBetweenParsed> {
 
     inner class RepeatableBetweenParsed(
-        val previous: Parsed,
+        val mappedFrom: Parsed,
         val left: L,
         val between: List<M>,
         val right: R
-    ) : Parsed(previous, right.indexEnd)
+    ) : Parsed(mappedFrom)
 
     inner class RepeatableBetweenJoinedParsed<T>(
-        val previous: Parsed,
+        val mapFrom: Parsed,
         val left: L,
         val between: T,
         val right: R
-    ) : Parsed(previous, right.indexEnd)
+    ) : Parsed(mapFrom)
 
     override fun parse(previous: Parsed): ParsedResult<RepeatableBetweenParsed> {
         return Between(left, Repeat(between), right).map {
             RepeatableBetweenParsed(
-                previous,
+                it,
                 it.left,
                 it.between.repeatersParsed,
                 it.right
@@ -55,7 +55,7 @@ class RepeatableBetween<L : Parsed, M : Parsed, R : Parsed>(
 
     fun <K> joinRepeaters(joinBetween: (parsed: List<M>) -> K): Parser<RepeatableBetweenJoinedParsed<K>> {
         return this.map {
-            RepeatableBetweenJoinedParsed(it.previous, it.left, joinBetween(it.between), it.right)
+            RepeatableBetweenJoinedParsed(it, it.left, joinBetween(it.between), it.right)
         }
     }
 }

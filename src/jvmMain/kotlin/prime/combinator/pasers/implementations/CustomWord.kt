@@ -24,18 +24,14 @@ import kotlin.Long
  * @since 2021
  */
 class CustomWord(private vararg val allowedChars: Parser<CharacterParsed>) : Parser<CustomWordParsed> {
-    inner class CustomWordParsed(val customWord: String, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
+    inner class CustomWordParsed(val customWord: String, mapFrom: Parsed) : Parsed(mapFrom)
 
     override fun parse(previous: Parsed): ParsedResult<CustomWordParsed> {
 
         return Repeat(Any(*allowedChars)).joinRepeaters { repeated: List<Any.AnyParsed> ->
             repeated.map { it.anyOne as CharacterParsed }.map { it.char }.joinToString(separator = "")
         }.map {
-            CustomWordParsed(
-                it.joined,
-                previous,
-                previous.indexEnd + it.joined.length
-            )
+            CustomWordParsed(it.joined, it)
         }.parse(previous)
     }
 }

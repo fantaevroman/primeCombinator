@@ -22,14 +22,13 @@ import kotlin.Long
  * @since 2021
  */
 class Long : EndOfInputParser<LongParsed>() {
-    inner class LongParsed(val long: Long, text: String, indexStart: Long, indexEnd: Long) :
-        Parsed(text, indexStart, indexEnd)
+    inner class LongParsed(val long: Long, mapFrom: Parsed) : Parsed(mapFrom)
 
     override fun parseNext(previous: Parsed): ParsedResult<LongParsed> {
         return Repeat(EnglishDigit())
             .joinRepeaters { it.map { it.digit.toString() }.joinToString(separator = "").toLong() }
             .map {
-                LongParsed(it.joined, it.text, it.indexStart, it.indexEnd)
+                LongParsed(it.joined, it)
             }.parse(previous)
     }
 }

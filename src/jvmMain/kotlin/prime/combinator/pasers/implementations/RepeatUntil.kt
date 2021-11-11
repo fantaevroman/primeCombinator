@@ -34,10 +34,8 @@ class RepeatUntil<R : Parsed, U : Parsed>(
 
     inner class JoinedParsed<T>(
         val joined: T,
-        text: String,
-        indexStart: Long,
-        indexEnd: Long
-    ) : Parsed(text, indexStart, indexEnd)
+        val mapFrom: Parsed
+    ) : Parsed(mapFrom)
 
 
     override fun parse(previous: Parsed): ParsedResult<RepeatUntilParsed> {
@@ -61,7 +59,7 @@ class RepeatUntil<R : Parsed, U : Parsed>(
 
     fun <K> joinRepeaters(joinBetween: (parsed: List<R>) -> K): Parser<JoinedParsed<K>> {
         return this.map {
-            JoinedParsed(joinBetween(it.repeatersParsed), it.text, it.indexStart, it.indexEnd)
+            JoinedParsed(joinBetween(it.repeatersParsed), it)
         }
     }
 }

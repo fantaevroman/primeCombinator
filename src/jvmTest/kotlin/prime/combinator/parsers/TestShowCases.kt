@@ -35,7 +35,7 @@ class TestShowCases {
 
     @Test
     fun testCustomParser() {
-        class UrlParsed(val protocol: String, val domain: String, mappedFrom: Parsed) : Parsed(mappedFrom, mappedFrom.indexEnd)
+        class UrlParsed(val protocol: String, val domain: String, mappedFrom: Parsed) : Parsed(mappedFrom)
 
         val urlParser = SequenceOf(
             Any(Str("http"), Str("https")),

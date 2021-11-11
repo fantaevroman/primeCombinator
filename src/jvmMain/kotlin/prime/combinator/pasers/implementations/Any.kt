@@ -20,13 +20,13 @@ import kotlin.Long
  * @since 2021
  */
 class Any(private vararg val parsers: Parser<*>) : EndOfInputParser<AnyParsed>() {
-    inner class AnyParsed(previous: Parsed, val anyOne: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
+    inner class AnyParsed(val anyOne: Parsed) : Parsed(anyOne)
 
     override fun parseNext(previous: Parsed): ParsedResult<AnyParsed> {
         val iterator = parsers.iterator()
         while (iterator.hasNext()) {
             val parserResult = iterator.next().parse(previous).map {
-                AnyParsed(previous, it, it.indexEnd)
+                AnyParsed(it)
             }
             if (parserResult.success()) {
                 return parserResult

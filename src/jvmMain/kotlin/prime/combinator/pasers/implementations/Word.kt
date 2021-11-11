@@ -20,13 +20,13 @@ import kotlin.Long
  * @since 2021
  */
 class Word() : Parser<Word.WordParsed> {
-    inner class WordParsed(val word: String, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
+    inner class WordParsed(val word: String, mapFrom: Parsed) : Parsed(mapFrom)
 
     override fun parse(previous: Parsed): ParsedResult<WordParsed> {
         return Repeat(EnglishLetter()).joinRepeaters {
             it.map { it.letter }.joinToString(separator = "")
         }.map {
-            WordParsed(it.joined, previous, it.indexEnd)
+            WordParsed(it.joined, it)
         }.parse(previous)
     }
 }

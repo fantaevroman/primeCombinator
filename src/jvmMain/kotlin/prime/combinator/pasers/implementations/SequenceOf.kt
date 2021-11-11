@@ -27,9 +27,10 @@ import kotlin.Long
 open class SequenceOf(vararg val parsers: Parser<out Parsed>) : Parser<SequenceOfParsed> {
     inner class SequenceOfParsed(
         val sequence: List<Parsed>,
-        previous: Parsed,
-        indexEnd: Long
-    ) : Parsed(previous, indexEnd)
+         text: String,
+         indexStart: Long,
+         indexEnd: Long
+    ) : Parsed(text, indexStart, indexEnd)
 
 
     override fun parse(previous: Parsed): ParsedResult<SequenceOfParsed> {
@@ -54,7 +55,8 @@ open class SequenceOf(vararg val parsers: Parser<out Parsed>) : Parser<SequenceO
         return ParsedResult.asSuccess(
             SequenceOfParsed(
                 successSequence,
-                successSequence.last(),
+                previous.text,
+                successSequence.first().indexStart,
                 successSequence.last().indexEnd
             )
         )

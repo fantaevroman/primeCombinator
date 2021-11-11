@@ -23,16 +23,13 @@ open class Repeat<R : Parsed>(
 ) : Parser<Repeat<R>.RepeatParsed> {
 
     inner class RepeatParsed(
-        previous: Parsed,
+        mapFrom: Parsed,
         val repeatersParsed: List<R>,
-    ) : Parsed(
-        previous,
-        repeatersParsed.last().indexEnd
-    )
+    ) : Parsed(mapFrom)
 
     override fun parse(previous: Parsed): ParsedResult<RepeatParsed> {
         return buildParser().map {
-            RepeatParsed(previous, it.repeatersParsed)
+            RepeatParsed(it, it.repeatersParsed)
         }.parse(previous)
     }
 

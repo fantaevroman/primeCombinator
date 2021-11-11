@@ -19,6 +19,7 @@ open class Parsed(
     val indexStart: Long,
     val indexEnd: Long
 ) {
+    constructor(mappedFrom: Parsed) : this(mappedFrom.text, mappedFrom.indexStart, mappedFrom.indexEnd)
     constructor(previous: Parsed, indexEnd: Long) : this(previous.text, previous.currentIndex(), indexEnd)
 
     fun currentIndex(): Long {

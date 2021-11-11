@@ -19,13 +19,13 @@ import kotlin.Long
  * @since 2021
  */
 class Spaces : EndOfInputParser<Spaces.SpacesParsed>() {
-    inner class SpacesParsed(val spaces: String, previous: Parsed, indexEnd: Long) : Parsed(previous, indexEnd)
+    inner class SpacesParsed(val spaces: String, mapFrom: Parsed) : Parsed(mapFrom)
 
     override fun parseNext(previous: Parsed): ParsedResult<SpacesParsed> {
         return Repeat(Character(' '))
             .joinRepeaters { it.map { it.char }.joinToString(separator = "") }
             .map {
-                SpacesParsed(it.joined, previous, it.indexEnd)
+                SpacesParsed(it.joined, it)
             }.parse(previous)
     }
 }
