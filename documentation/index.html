@@ -231,7 +231,7 @@ assertEquals("combinator.primeframeworks.com", domainName)
                     </section>
                     <pre><code class="language-kotlin hljs">//Kotlin example
 
-class UrlParsed(val protocol: String, val domain: String, mappedFrom: Parsed) : Parsed(mappedFrom, mappedFrom.indexEnd)
+class UrlParsed(val protocol: String, val domain: String, mappedFrom: Parsed) : Parsed(mappedFrom)
 
 val urlParser = SequenceOf(
     Any(Str("http"), Str("https")),
@@ -247,26 +247,31 @@ val urlParser = SequenceOf(
 val urlParsed = urlParser.parse("http://combinator.primeframeworks.com").get()
 
 assertEquals("http", urlParsed.protocol)
-assertEquals("combinator.primeframeworks.com", urlParsed.domain)
-</code></pre>
+assertEquals("combinator.primeframeworks.com", urlParsed.domain)</code></pre>
                     <p>Congratulations! Now you have custom parser <code>"urlParser"</code> and can combine it with
                         other Parsers.
-                        You can try out: <code class="language-kotlin hljs">SequenceOf(Str("url: "),
-                            urlParser).parse("url: http://combinator.primeframeworks.com")</code>
+                        You can try out:
                     </p>
+                    <code class="language-kotlin hljs m-t-5">SequenceOf(Str("url: "),
+                        urlParser).parse("url: http://combinator.primeframeworks.com")</code>
+                    <br>
+
                     <p>
-                        <code>Parsed</code> is a general interface for parsers output. We created custom output <code>UrlParsed</code>
+                        <code class="m-t-5">Parsed</code> is a general interface for parsers output. We created custom output <code>UrlParsed</code>
                         for custom parser <code>urlParser</code> and made it
-                        strictly typed. <code class="language-kotlin hljs">class UrlParsed(val protocol: String, val
-                        domain: String, mappedFrom: Parsed) : Parsed(mappedFrom, mappedFrom.indexEnd)</code> this part
-                        is needed to save positions in text from which
-                        parser reads. As we're only changing output but not parsing logic we simply copy indexes from
-                        output from "mapped" parser.
-                        In other words we save position "a" (where we started parse) and position "b" (where we stopped
-                        parsing) in <code>Parsed</code> core class.
-                        You always can simply use this approach for any custom parser without need to "look inside"
-                        framework unless you want to.
+                        strictly typed.
                     </p>
+
+                    <code class="language-kotlin hljs">class UrlParsed(val protocol: String, val domain: String, mappedFrom: Parsed) : Parsed(mappedFrom)</code>
+                    <br>
+<p> This part with base constructor
+    is needed to save positions in text from which
+    parser reads. As we're only changing output but not parsing logic we simply copy indexes from
+    output from "mapped" parser.
+    In other words we save position "a" (where we started parse) and position "b" (where we stopped
+    parsing) in <code>Parsed</code> core class.
+    You always can simply use this approach for any custom parser without need to "look inside"
+    framework unless you want to.</p>
 
                     <hr class="divider">
 
