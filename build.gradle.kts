@@ -1,10 +1,14 @@
 plugins {
     kotlin("multiplatform") version "1.4.31"
     id("maven-publish")
+    id("signing")
 }
 
 group = "com.primeframeworks"
-version = "0.2"
+version = "1.0.1"
+
+val sonotypeUsername: String by project
+val sonotypePassword: String by project
 
 repositories {
     mavenCentral()
@@ -20,16 +24,6 @@ kotlin {
         }
         withJava()
     }
-    sourceSets {
-        val jvmMain by getting
-        val jvmTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit5"))
-                implementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-                runtimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
-            }
-        }
-    }
 }
 
 publishing {
@@ -37,7 +31,7 @@ publishing {
         create<MavenPublication>("primeCombinatorLibrary") {
             pom {
                 name.set("Prime Combinator Library")
-                description.set("A concise description of my library")
+                description.set("Kotlin parsing combinator library which allows to write human-readable parsing code.")
                 url.set("http://combinator.primeframeworks.com")
                 licenses {
                     license {
@@ -53,9 +47,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection.set("scm:git:git://example.com/my-library.git")
-                    developerConnection.set("scm:git:ssh://example.com/my-library.git")
-                    url.set("http://example.com/my-library/")
+                    connection.set("scm:git:git://github.com/fantaevroman/primeCombinator.git")
+                    developerConnection.set("scm:git:ssh://github.com:fantaevroman/primeCombinator.git")
+                    url.set("https://github.com/fantaevroman/primeCombinator.git")
                 }
             }
             from(components["kotlin"])
@@ -63,9 +57,32 @@ publishing {
     }
 
     repositories {
+/**
         maven {
-            name = "myRepo"
+            name = "localRepo"
             url = uri(layout.buildDirectory.dir("repo"))
         }
+ **/
+
+        maven {
+            name = "centralStageRepo"
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = sonotypeUsername
+                password = sonotypePassword
+            }
+        }
+
+
+    }
+}
+
+signing {
+    sign(publishing.publications)
+}
+
+tasks.withType<PublishToMavenRepository>().configureEach {
+    onlyIf {
+        (publication.artifactId == "primeCombinator")
     }
 }
