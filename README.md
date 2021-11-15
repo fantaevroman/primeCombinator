@@ -30,7 +30,20 @@ Framework does its best to provide strictly typed system where possible as well 
 http://combinator.primeframeworks.com 
 
 ## How to install:
-todo
+Maven:
+```xml
+<dependency>
+    <groupId>com.primeframeworks</groupId>
+    <artifactId>primeCombinator</artifactId>
+    <version>1.0.1</version>
+    <scope>compile</scope>
+</dependency>
+```
+
+Gradle:
+```groovy
+implementation com.primeframeworks:primeCombinator:1.0.1
+```
 
 ## Licence:
 Apache License
