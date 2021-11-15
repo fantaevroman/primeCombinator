@@ -41,7 +41,7 @@ Maven:
 ```
 
 Gradle:
-```groovy
+```code
 implementation com.primeframeworks:primeCombinator:1.0.1
 ```
 
