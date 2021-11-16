@@ -35,14 +35,14 @@ Maven:
 <dependency>
     <groupId>com.primeframeworks</groupId>
     <artifactId>primeCombinator</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.9</version>
     <scope>compile</scope>
 </dependency>
 ```
 
 Gradle:
 ```code
-implementation com.primeframeworks:primeCombinator:1.0.1
+implementation com.primeframeworks:primeCombinator:1.0.9
 ```
 
 ## Licence:

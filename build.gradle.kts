@@ -2,13 +2,22 @@ plugins {
     kotlin("multiplatform") version "1.4.31"
     id("maven-publish")
     id("signing")
+    id("org.jetbrains.dokka") version "1.4.32"
 }
 
 group = "com.primeframeworks"
-version = "1.0.1"
+version = "1.0.9"
 
 val sonotypeUsername: String by project
 val sonotypePassword: String by project
+
+val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
+
+val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
+    dependsOn(dokkaHtml)
+    archiveClassifier.set("javadoc")
+    from(dokkaHtml.outputDirectory)
+}
 
 repositories {
     mavenCentral()
@@ -28,7 +37,8 @@ kotlin {
 
 publishing {
     publications {
-        create<MavenPublication>("primeCombinatorLibrary") {
+        publications.withType(MavenPublication::class) {
+            artifact(javadocJar)
             pom {
                 name.set("Prime Combinator Library")
                 description.set("Kotlin parsing combinator library which allows to write human-readable parsing code.")
@@ -52,17 +62,16 @@ publishing {
                     url.set("https://github.com/fantaevroman/primeCombinator.git")
                 }
             }
-            from(components["kotlin"])
         }
     }
 
     repositories {
-/**
+        /**
         maven {
             name = "localRepo"
             url = uri(layout.buildDirectory.dir("repo"))
         }
- **/
+         **/
 
         maven {
             name = "centralStageRepo"
@@ -79,10 +88,4 @@ publishing {
 
 signing {
     sign(publishing.publications)
-}
-
-tasks.withType<PublishToMavenRepository>().configureEach {
-    onlyIf {
-        (publication.artifactId == "primeCombinator")
-    }
 }
